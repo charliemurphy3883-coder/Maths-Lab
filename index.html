@@ -241,7 +241,7 @@ input[type=text],input[type=password]{border:2px solid var(--line);background:va
   }
   function pickVoice() {
     const vs = englishVoices();
-    voice = (S.voiceName && vs.find(v => v.name === S.voiceName)) || vs[0] || null;
+    voice = S.voiceName === "__system" ? null : (S.voiceName && vs.find(v => v.name === S.voiceName)) || vs[0] || null;
   }
   function speechText(s) {
     return String(s).replace(/\*\*/g, "").replace(/[  ]/g, "")
@@ -477,7 +477,7 @@ input[type=text],input[type=password]{border:2px solid var(--line);background:va
       </section>`;
     const sw = (id, k) => { const b = $(id); b.onclick = () => { S[k] = !S[k]; b.setAttribute("aria-checked", S[k]); save(); if (!S.voice) hush(); }; };
     sw("#tVoice", "voice"); sw("#tSound", "sound");
-    const vp = $("#voicePick"), fillVoices = () => { const vs = englishVoices(); vp.innerHTML = vs.length ? vs.map(v => `<option value="${esc(v.name)}" ${voice && v.name === voice.name ? "selected" : ""}>${esc(v.name)} (${esc(v.lang)})${/premium/i.test(v.name + v.voiceURI) ? " ★ Premium" : /enhanced/i.test(v.name + v.voiceURI) ? " ★ Enhanced" : ""}</option>`).join("") : `<option>No voices found on this device</option>`; };
+    const vp = $("#voicePick"), fillVoices = () => { const vs = englishVoices(); vp.innerHTML = `<option value="__system" ${S.voiceName === "__system" ? "selected" : ""}>iPad default voice (the one ticked in Settings)</option>` + (vs.length ? vs.map(v => `<option value="${esc(v.name)}" ${voice && v.name === voice.name ? "selected" : ""}>${esc(v.name)} (${esc(v.lang)})${/premium/i.test(v.name + v.voiceURI) ? " ★ Premium" : /enhanced/i.test(v.name + v.voiceURI) ? " ★ Enhanced" : ""}</option>`).join("") : ""); };
     fillVoices(); if ("speechSynthesis" in window) speechSynthesis.addEventListener("voiceschanged", fillVoices);
     vp.onchange = () => { S.voiceName = vp.value; save(); pickVoice(); say(`Hi ${S.name}! I'm your new voice. What is 3 times 4?`); };
     $("#testVoice").onclick = () => { audio(); sfx("right"); say(`Hi ${S.name}! Well done! What is 3 times 4?`); };
