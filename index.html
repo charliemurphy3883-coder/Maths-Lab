@@ -100,6 +100,7 @@ h1{font-size:2.3rem} h2{font-size:1.5rem} h3{font-size:1.2rem}
 .qhead .mascot{width:76px;height:76px;flex:none}
 .prompt{font-size:1.6rem;font-weight:600;line-height:1.3;flex:1;min-width:0}
 .prompt b{color:var(--purple)}
+.nw{white-space:nowrap}
 .speak{background:var(--teal);color:#fff;border-radius:16px;padding:8px 14px;font-weight:700;box-shadow:0 4px 0 #0b8f95;display:inline-flex;gap:6px;align-items:center}
 .speak svg{width:22px;height:22px}
 .diagram{display:flex;justify-content:center}
@@ -129,8 +130,8 @@ h1{font-size:2.3rem} h2{font-size:1.5rem} h3{font-size:1.2rem}
 .fb{border-radius:18px;padding:14px 16px;display:grid;gap:6px;font-size:1.15rem}
 .fb.good{background:#d9f9e7;border:3px solid var(--green)} .fb.bad{background:#ffe3e4;border:3px solid var(--red)} .fb.try{background:#fff3cf;border:3px solid var(--yellow)}
 .fb h3{font-size:1.45rem}
-.nudge{position:absolute;right:12px;top:-14px;transform:translateY(-100%);background:#fff;border:3px solid var(--purple);border-radius:20px;padding:10px 14px;display:grid;gap:8px;max-width:300px;z-index:2;box-shadow:0 8px 20px rgba(36,22,79,.25);animation:pop .35s cubic-bezier(.2,1.6,.4,1)}
-@keyframes pop{from{transform:translateY(-100%) scale(.6);opacity:0}to{transform:translateY(-100%) scale(1);opacity:1}}
+.nudge{position:absolute;right:12px;top:12px;background:#fff;border:3px solid var(--purple);border-radius:20px;padding:10px 14px;display:grid;gap:8px;max-width:300px;z-index:2;box-shadow:0 8px 20px rgba(36,22,79,.25);animation:pop .35s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
 /* overlays */
 .tick{position:fixed;inset:0;display:grid;place-items:center;z-index:40;pointer-events:none}
 .tick svg{width:min(52vw,320px);height:auto;animation:tickpop 1.1s cubic-bezier(.2,1.5,.4,1) forwards}
@@ -185,7 +186,9 @@ input[type=text],input[type=password]{border:2px solid var(--line);background:va
   const KEY = "coops-maths-lab-v1";
   const $ = s => document.querySelector(s);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const md = s => esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+  // keep every number (e.g. 10 000, 861 500, 3.75) on one line
+  const nw = h => h.replace(/\d+(?:[\u202F\u2009 ]\d{3})+(?:\.\d+)?|\d[\d.,:/]*\d/g, m => `<span class="nw">${m}</span>`);
+  const md = s => nw(esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>"));
   const fmtSec = s => { s = Math.max(0, Math.round(s)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
   const rnd = a => a[Math.floor(Math.random() * a.length)];
   const COLORS = ["#2f6bff", "#ff4fa3", "#1fc46b", "#ff8a3d", "#8b5cf6", "#12c2c9", "#ffc93c", "#ff5a5f"];
@@ -223,12 +226,23 @@ input[type=text],input[type=password]{border:2px solid var(--line);background:va
 
   /* ---------- read aloud ---------- */
   let voice = null;
-  function pickVoice() {
-    if (!("speechSynthesis" in window)) return;
-    const vs = speechSynthesis.getVoices();
-    voice = vs.find(v => /en-AU/i.test(v.lang) && /karen|lee|catherine/i.test(v.name)) || vs.find(v => /en-AU/i.test(v.lang)) || vs.find(v => /en-GB/i.test(v.lang)) || vs.find(v => /^en/i.test(v.lang)) || null;
+  const NOVELTY = /albert|bad news|bahh|bells|boing|bubbles|cellos|good news|jester|organ|superstar|trinoids|whisper|wobble|zarvox|fred|junior|ralph|kathy|hysterical|grandma|grandpa|eddy|flo|reed|rocko|sandy|shelley/i;
+  function voiceScore(v) {
+    const n = (v.name + " " + v.voiceURI).toLowerCase();
+    let sc = 0;
+    if (/premium/.test(n)) sc += 300; else if (/enhanced|neural|natural/.test(n)) sc += 200;
+    if (/en[-_]au/i.test(v.lang)) sc += 60; else if (/en[-_]gb/i.test(v.lang)) sc += 40; else if (/en[-_](nz|ie)/i.test(v.lang)) sc += 35; else if (/en[-_]us/i.test(v.lang)) sc += 30;
+    if (/karen|lee|catherine|matilda|serena|daniel|kate|ava|zoe|evan|samantha/.test(n)) sc += 10;
+    return sc;
   }
-  if ("speechSynthesis" in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+  function englishVoices() {
+    if (!("speechSynthesis" in window)) return [];
+    return speechSynthesis.getVoices().filter(v => /^en/i.test(v.lang) && !NOVELTY.test(v.name)).sort((a, b) => voiceScore(b) - voiceScore(a));
+  }
+  function pickVoice() {
+    const vs = englishVoices();
+    voice = (S.voiceName && vs.find(v => v.name === S.voiceName)) || vs[0] || null;
+  }
   function speechText(s) {
     return String(s).replace(/\*\*/g, "").replace(/[  ]/g, "")
       .replace(/☐/g, " the box ")
@@ -444,7 +458,9 @@ input[type=text],input[type=password]{border:2px solid var(--line);background:va
       <section class="card"><h3>Sound</h3>
         <div class="toggle"><span>Read questions out loud</span><button class="switch" role="switch" id="tVoice" aria-checked="${S.voice}" aria-label="Read questions out loud"></button></div>
         <div class="toggle"><span>Sound effects</span><button class="switch" role="switch" id="tSound" aria-checked="${S.sound}" aria-label="Sound effects"></button></div>
+        <label class="muted">Voice<select id="voicePick" style="width:100%;border:2px solid var(--line);background:var(--soft);border-radius:14px;padding:10px 12px;font:inherit;color:inherit"></select></label>
         <button class="btn" id="testVoice">Test the voice</button>
+        <p class="muted" style="margin:0;font-size:.9rem">Voices marked Premium or Enhanced sound the most natural. To get them on the iPad: Settings → Accessibility → Spoken Content → Voices → English → pick a voice (e.g. Karen or Lee, Australia) → download the Enhanced or Premium version. Then reopen this app and choose it here.</p>
       </section>
       <section class="card"><h3>Settings</h3>
         <label class="muted">Name<input type="text" id="setName" value="${esc(S.name)}"></label>
@@ -461,7 +477,10 @@ input[type=text],input[type=password]{border:2px solid var(--line);background:va
       </section>`;
     const sw = (id, k) => { const b = $(id); b.onclick = () => { S[k] = !S[k]; b.setAttribute("aria-checked", S[k]); save(); if (!S.voice) hush(); }; };
     sw("#tVoice", "voice"); sw("#tSound", "sound");
-    $("#testVoice").onclick = () => { audio(); sfx("right"); say(`Hi ${S.name}! What is 3 times 4?`); };
+    const vp = $("#voicePick"), fillVoices = () => { const vs = englishVoices(); vp.innerHTML = vs.length ? vs.map(v => `<option value="${esc(v.name)}" ${voice && v.name === voice.name ? "selected" : ""}>${esc(v.name)} (${esc(v.lang)})${/premium/i.test(v.name + v.voiceURI) ? " ★ Premium" : /enhanced/i.test(v.name + v.voiceURI) ? " ★ Enhanced" : ""}</option>`).join("") : `<option>No voices found on this device</option>`; };
+    fillVoices(); if ("speechSynthesis" in window) speechSynthesis.addEventListener("voiceschanged", fillVoices);
+    vp.onchange = () => { S.voiceName = vp.value; save(); pickVoice(); say(`Hi ${S.name}! I'm your new voice. What is 3 times 4?`); };
+    $("#testVoice").onclick = () => { audio(); sfx("right"); say(`Hi ${S.name}! Well done! What is 3 times 4?`); };
     $("#setCount").oninput = e => $("#dcLabel").textContent = e.target.value;
     $("#saveSet").onclick = () => { S.name = $("#setName").value.trim() || "Cooper"; S.dailyCount = +$("#setCount").value; S.pin = $("#setPin").value.trim() || null; save(); $("#setMsg").textContent = "Saved. The new daily count starts with tomorrow's mission."; };
     document.querySelectorAll("[data-setlevel]").forEach(b => b.onclick = () => { const l = +b.dataset.setlevel; M.SKILLS.forEach(s => { if (s.id !== "puzzle") { S.skills[s.id].level = l; S.skills[s.id].recent = []; } }); save(); renderParents(); toast(`All skills set to ${M.YEAR[l]}`); });
@@ -604,7 +623,7 @@ input[type=text],input[type=password]{border:2px solid var(--line);background:va
   function feedbackHtml() {
     if (cur.state === "retry") return `<div class="fb try"><h3>Not quite. Try again! 💪</h3><span>Check your working, or tap 💡 Hint if you're stuck.</span></div>`;
     if (cur.state === "right") return `<div class="fb good"><h3>${cur.praise} +${cur.pts} points</h3>${cur.fast && cur.help === 0 ? `<span>⚡ Speed bonus: under ${fmtSec(cur.q.target)}!</span>` : ""}</div>`;
-    if (cur.state === "wrong") return `<div class="fb bad"><h3>The answer is ${esc(M.answerText(cur.q.answer))}${cur.q.unit ? " " + esc(cur.q.unit) : ""}</h3><span>Good try! Read the steps above. You'll get it next time.</span></div>`;
+    if (cur.state === "wrong") return `<div class="fb bad"><h3>The answer is ${nw(esc(M.answerText(cur.q.answer)))}${cur.q.unit ? " " + esc(cur.q.unit) : ""}</h3><span>Good try! Read the steps above. You'll get it next time.</span></div>`;
     return "";
   }
   const PRAISE = ["Well done!", "Brilliant!", "Awesome!", "Nailed it!", "Spot on!", "Superstar!", "Legend!", "Too easy!", "Amazing!"];
