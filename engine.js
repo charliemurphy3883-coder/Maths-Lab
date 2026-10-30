@@ -9,12 +9,12 @@
   const gcd = (a, b) => (b ? gcd(b, a % b) : Math.abs(a));
   const coN = d => { let n; do { n = ri(1, d - 1); } while (gcd(n, d) !== 1); return n; };
   const r6 = n => Math.round(n * 1e6) / 1e6;
-  // Australian style: spaces for 5+ digit numbers (12 345), none for 4 digits (4567)
+  // Thousands separated by a narrow non-breaking space (4 567, 1 230 000) so numbers never wrap
   function fmt(n) {
     if (typeof n !== "number" || !isFinite(n)) return String(n);
     const neg = n < 0; n = r6(Math.abs(n));
     let [i, d] = n.toString().split(".");
-    if (i.length > 4) i = i.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    if (i.length > 3) i = i.replace(/\B(?=(\d{3})+(?!\d))/g, "\u202F");
     return (neg ? "−" : "") + i + (d ? "." + d : "");
   }
   const money = c => "$" + (c / 100).toFixed(2);
@@ -30,7 +30,7 @@
     choice: (o, c) => ({ t: "choice", o, c }),
   };
   function parseNum(s) {
-    s = String(s).replace(/[\s,$%° ]/g, "").replace(/−/g, "-");
+    s = String(s).replace(/[\s,$%°\u2009\u202F]/g, "").replace(/−/g, "-");
     if (/^-?\d+\/\d+$/.test(s)) { const [n, d] = s.split("/").map(Number); return d ? n / d : NaN; }
     if (!/^-?(\d+\.?\d*|\.\d+)$/.test(s)) return NaN;
     return Number(s);

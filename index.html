@@ -7,145 +7,176 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Maths Lab">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#3657e8">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#5b5bf7">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap">
 <style>
-/* Layout: mission-control for one kid — Home (today's mission), Learn (skills), Trophies, Grown-ups; questions take over the full screen. */
+/* Layout: a bright arcade-style maths lab. Gradient sky, chunky white cards, Bolt the robot as guide.
+   Deliberately single (bright) theme for a kids' app. */
 :root{
-  --bg:#eef3fb; --surface:#ffffff; --ink:#14213d; --muted:#5b6b85; --line:#d6e0ef; --soft:#e4ebfb;
-  --brand:#3657e8; --brand-2:#6f86ff; --on-brand:#ffffff;
-  --good:#12925f; --good-soft:#dcf5ea; --bad:#d6452f; --bad-soft:#fde4df; --gold:#e6a700; --gold-soft:#fff3cc;
-  --font:ui-rounded,"SF Pro Rounded","Nunito","Segoe UI Variable Display","Segoe UI",system-ui,sans-serif;
-  --r:18px; color-scheme:light;
+  --sky1:#5b5bf7; --sky2:#b44cf0; --sky3:#ff6fa8;
+  --card:#ffffff; --ink:#24164f; --muted:#6b5f95; --line:#e5defa; --soft:#f3efff;
+  --blue:#2f6bff; --pink:#ff4fa3; --yellow:#ffc93c; --green:#1fc46b; --orange:#ff8a3d; --purple:#8b5cf6; --teal:#12c2c9; --red:#ff5a5f;
+  --good:#16b364; --bad:#ff5a5f;
+  --font:"Fredoka",ui-rounded,"SF Pro Rounded","Arial Rounded MT Bold","Segoe UI",system-ui,sans-serif;
+  --r:24px; color-scheme:light;
 }
-@media (prefers-color-scheme:dark){:root{
-  --bg:#0f1626; --surface:#18223a; --ink:#e9eefb; --muted:#9aa8c4; --line:#2a3654; --soft:#1f2c4a;
-  --brand:#7d95ff; --brand-2:#a5b5ff; --on-brand:#0f1626;
-  --good:#3fd398; --good-soft:#123a2b; --bad:#ff7c69; --bad-soft:#3d1a16; --gold:#ffd34d; --gold-soft:#3a3010; color-scheme:dark}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%}
-body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:18px;line-height:1.4;-webkit-user-select:none;user-select:none;-webkit-text-size-adjust:100%}
+html,body{margin:0;min-height:100%}
+body{background:linear-gradient(160deg,var(--sky1) 0%,var(--sky2) 55%,var(--sky3) 100%) fixed;color:var(--ink);font-family:var(--font);font-size:19px;line-height:1.35;-webkit-user-select:none;user-select:none;-webkit-text-size-adjust:100%}
 button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;touch-action:manipulation}
-input,textarea,select{font:inherit;color:inherit;-webkit-user-select:text;user-select:text}
-:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+input,textarea{font:inherit;color:inherit;-webkit-user-select:text;user-select:text}
+:focus-visible{outline:4px solid var(--yellow);outline-offset:2px}
 [hidden]{display:none!important}
-.app{max-width:920px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) calc(100px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));display:grid;gap:16px}
-h1,h2,h3{margin:0;line-height:1.15;text-wrap:balance}
-h1{font-size:2rem;font-weight:800;letter-spacing:-.01em}
-h2{font-size:1.35rem;font-weight:800}
-h3{font-size:1.1rem;font-weight:800}
+.app{max-width:940px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) calc(110px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));display:grid;gap:16px}
+h1,h2,h3{margin:0;line-height:1.1;text-wrap:balance;font-weight:700}
+h1{font-size:2.3rem} h2{font-size:1.5rem} h3{font-size:1.2rem}
+.white{color:#fff}
 .muted{color:var(--muted)}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:grid;gap:12px;min-width:0}
+.card{background:var(--card);border-radius:var(--r);padding:18px;display:grid;gap:12px;min-width:0;box-shadow:0 8px 0 rgba(36,22,79,.12)}
 .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .between{justify-content:space-between}
-.btn{background:var(--soft);border-radius:14px;padding:12px 18px;font-weight:800;min-height:48px}
-.btn.primary{background:var(--brand);color:var(--on-brand)}
-.btn.good{background:var(--good);color:#fff}
-.btn.big{font-size:1.25rem;padding:16px 26px;min-height:60px;border-radius:18px}
+.btn{background:var(--soft);border-radius:16px;padding:12px 18px;font-weight:700;min-height:52px;box-shadow:0 4px 0 rgba(36,22,79,.15);transition:transform .08s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(36,22,79,.15)}
+.btn.blue{background:var(--blue);color:#fff;box-shadow:0 5px 0 #1d47c2}
+.btn.green{background:var(--green);color:#fff;box-shadow:0 5px 0 #11904c}
+.btn.pink{background:var(--pink);color:#fff;box-shadow:0 5px 0 #c92c7a}
+.btn.yellow{background:var(--yellow);color:var(--ink);box-shadow:0 5px 0 #d9a514}
+.btn.orange{background:var(--orange);color:#fff;box-shadow:0 5px 0 #d1631b}
+.btn.purple{background:var(--purple);color:#fff;box-shadow:0 5px 0 #6236c9}
+.btn.big{font-size:1.4rem;padding:16px 28px;min-height:66px;border-radius:20px}
 .btn:disabled{opacity:.45}
-.chip{white-space:nowrap;display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 12px;font-weight:800;font-size:.85rem;background:var(--soft)}
-.chip.y1{background:var(--gold-soft);color:var(--ink)} .chip.y2{background:var(--soft);color:var(--brand)} .chip.y3{background:var(--good-soft);color:var(--good)}
+.chip{white-space:nowrap;display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 14px;font-weight:700;font-size:.9rem;background:var(--soft)}
+.chip.y1{background:#fff2c4;color:#8a5a00} .chip.y2{background:#dbe6ff;color:#1d47c2} .chip.y3{background:#d4f8e4;color:#0f7a43}
+.hud .chip{font-size:1.05rem;padding:8px 16px;background:rgba(255,255,255,.95)}
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
-/* top / hero */
-.hello{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
-.stat{display:flex;gap:10px;flex-wrap:wrap}
-.stat .chip{font-size:1rem;padding:8px 14px;background:var(--surface);border:1px solid var(--line)}
-.mission{background:linear-gradient(135deg,var(--brand),var(--brand-2));color:var(--on-brand);border:0}
-.mission .muted{color:inherit;opacity:.85}
-.ring{width:96px;height:96px;flex:none}
-.ring circle{fill:none;stroke-width:10}
-.ring .bgc{stroke:rgba(255,255,255,.3)} .ring .fg{stroke:#fff;stroke-linecap:round;transition:stroke-dashoffset .5s}
-.ring text{fill:#fff;font-weight:800;font-size:20px;font-family:var(--font)}
-.mission .btn{background:#fff;color:#2340c9}
+/* hero */
+.hero{display:flex;align-items:center;gap:16px}
+.hero .mascot{width:120px;height:120px;flex:none;cursor:pointer}
+.bubble{position:relative;background:#fff;border-radius:20px;padding:12px 16px;font-weight:600;box-shadow:0 6px 0 rgba(36,22,79,.12);max-width:520px}
+.bubble::before{content:"";position:absolute;left:-12px;top:24px;border:8px solid transparent;border-right:12px solid #fff}
+.mission{background:linear-gradient(135deg,#ffd84d,#ff9f43);color:var(--ink)}
+.ring{width:110px;height:110px;flex:none}
+.ring circle{fill:none;stroke-width:12}
+.ring .bgc{stroke:rgba(255,255,255,.5)} .ring .fg{stroke:var(--ink);stroke-linecap:round;transition:stroke-dashoffset .6s}
+.ring text{fill:var(--ink);font-weight:700;font-size:22px;font-family:var(--font)}
 .stars{display:flex;gap:4px}
-.star{width:28px;height:28px}
-.week{display:flex;gap:6px}
-.week span{width:34px;height:34px;border-radius:10px;background:var(--soft);display:grid;place-items:center;font-size:.75rem;font-weight:800;color:var(--muted)}
-.week span.on{background:var(--gold);color:#3a2a00}
-.week span.today{outline:2px solid var(--brand);outline-offset:1px}
-.bar{height:12px;border-radius:999px;background:var(--soft);overflow:hidden}
-.bar i{display:block;height:100%;background:var(--brand);border-radius:999px}
-.skillrow{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.star{width:32px;height:32px}
+.week{display:flex;gap:6px;flex-wrap:wrap}
+.week span{width:40px;height:40px;border-radius:12px;background:var(--soft);display:grid;place-items:center;font-weight:700;color:var(--muted)}
+.week span.on{background:var(--orange);color:#fff}
+.week span.today{outline:3px solid var(--purple);outline-offset:1px}
+.bar{height:14px;border-radius:999px;background:var(--soft);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--teal),var(--blue))}
+.skillrow{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:2px dashed var(--line)}
 .skillrow:first-child{border-top:0}
+.skillrow .dot{width:44px;height:44px;border-radius:14px;flex:none;display:grid;place-items:center;color:#fff;font-weight:700;font-size:1.2rem}
 .skillrow .grow{flex:1;min-width:0;display:grid;gap:6px}
-.skillrow b{font-size:1rem}
+@media (max-width:560px){.skillrow{flex-wrap:wrap}.skillrow .grow{flex-basis:calc(100% - 60px)}.skillrow .chip{margin-left:56px}}
 /* tabs */
-.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:center;padding:6px max(8px,env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));z-index:5}
-.tabs button{flex:1;max-width:180px;display:grid;justify-items:center;gap:2px;padding:6px;border-radius:12px;font-size:.8rem;font-weight:800;color:var(--muted)}
-.tabs button svg{width:26px;height:26px}
-.tabs button[aria-current="page"]{color:var(--brand);background:var(--soft)}
+.tabs{position:fixed;left:0;right:0;bottom:0;background:#fff;display:flex;justify-content:center;gap:6px;padding:8px max(10px,env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));z-index:5;box-shadow:0 -6px 20px rgba(36,22,79,.15)}
+.tabs button{flex:1;max-width:190px;display:grid;justify-items:center;gap:2px;padding:6px;border-radius:16px;font-size:.9rem;font-weight:700;color:var(--muted)}
+.tabs button svg{width:30px;height:30px}
+.tabs button[aria-current="page"]{color:#fff;background:var(--purple)}
 /* question screen */
-.qscreen{position:fixed;inset:0;background:var(--bg);z-index:10;overflow:auto;padding:calc(10px + env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
-.qwrap{max-width:900px;margin:0 auto;display:grid;gap:12px}
-.qtop{display:flex;align-items:center;gap:12px}
-.x{width:44px;height:44px;border-radius:50%;background:var(--surface);border:1px solid var(--line);font-size:1.4rem;font-weight:800;flex:none}
-.prog{flex:1;display:flex;gap:4px}
-.prog i{flex:1;height:10px;border-radius:999px;background:var(--line)}
-.prog i.ok{background:var(--good)} .prog i.no{background:var(--bad)} .prog i.cur{background:var(--brand)}
-.timer{font-variant-numeric:tabular-nums;font-weight:800;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:6px 10px;min-width:72px;text-align:center}
-.timer.over{color:var(--bad)}
+.qscreen{position:fixed;inset:0;z-index:10;overflow:auto;background:linear-gradient(160deg,var(--sky1) 0%,var(--sky2) 60%,var(--sky3) 100%);padding:calc(12px + env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+.qwrap{max-width:960px;margin:0 auto;display:grid;gap:12px}
+.qtop{display:flex;align-items:center;gap:10px}
+.round{width:50px;height:50px;border-radius:50%;background:#fff;font-size:1.4rem;font-weight:700;flex:none;display:grid;place-items:center;box-shadow:0 4px 0 rgba(36,22,79,.18)}
+.round svg{width:26px;height:26px}
+.prog{flex:1;display:flex;gap:5px}
+.prog i{flex:1;height:14px;border-radius:999px;background:rgba(255,255,255,.35)}
+.prog i.ok{background:var(--green)} .prog i.no{background:var(--red)} .prog i.cur{background:#fff}
+.timer{font-variant-numeric:tabular-nums;font-weight:700;background:#fff;border-radius:16px;padding:8px 12px;min-width:80px;text-align:center;box-shadow:0 4px 0 rgba(36,22,79,.18)}
+.timer.over{color:var(--red)}
 .qbody{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:14px;align-items:start}
 @media (max-width:760px){.qbody{grid-template-columns:minmax(0,1fr)}}
-.prompt{font-size:1.5rem;font-weight:700;line-height:1.35}
-.prompt b{color:var(--brand)}
+.qcard{position:relative}
+.qhead{display:flex;gap:12px;align-items:flex-start}
+.qhead .mascot{width:76px;height:76px;flex:none}
+.prompt{font-size:1.6rem;font-weight:600;line-height:1.3;flex:1;min-width:0}
+.prompt b{color:var(--purple)}
+.speak{background:var(--teal);color:#fff;border-radius:16px;padding:8px 14px;font-weight:700;box-shadow:0 4px 0 #0b8f95;display:inline-flex;gap:6px;align-items:center}
+.speak svg{width:22px;height:22px}
 .diagram{display:flex;justify-content:center}
 .diagram svg{max-width:100%;height:auto}
-.answer{display:flex;align-items:center;gap:10px;background:var(--bg);border:3px solid var(--line);border-radius:16px;padding:10px 16px;min-height:68px;font-size:2rem;font-weight:800;font-variant-numeric:tabular-nums}
-.answer.focus{border-color:var(--brand)}
-.answer .val{flex:1;min-width:0;overflow-wrap:anywhere}
-.answer .ph{color:var(--muted);font-size:1.1rem;font-weight:600}
-.answer .unit{color:var(--muted);font-size:1.2rem}
-.answer.shake{animation:shake .35s}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
-@media (prefers-reduced-motion:reduce){.answer.shake{animation:none}}
-.keypad{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.keypad button{background:var(--surface);border:1px solid var(--line);border-radius:14px;min-height:62px;font-size:1.6rem;font-weight:800}
-.keypad button:active{transform:scale(.97)}
-.keypad .check{grid-column:span 2;background:var(--brand);color:var(--on-brand);border-color:var(--brand);font-size:1.3rem}
-.choices{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
-.choices button{background:var(--surface);border:2px solid var(--line);border-radius:16px;min-height:70px;font-size:1.5rem;font-weight:800}
-.choices button.sel{border-color:var(--brand);background:var(--soft)}
-.helpbar{display:flex;gap:8px;flex-wrap:wrap}
-.helpbar .btn{flex:1;min-width:120px}
+.answer{display:flex;align-items:center;gap:10px;background:#fff;border:4px solid #fff;border-radius:20px;padding:10px 18px;min-height:76px;font-size:2.3rem;font-weight:700;font-variant-numeric:tabular-nums;box-shadow:0 6px 0 rgba(36,22,79,.15)}
+.answer.focus{border-color:var(--yellow)}
+.answer .val{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.answer .ph{color:#b3a9d6;font-size:1.2rem;font-weight:600}
+.answer .unit{color:var(--muted);font-size:1.4rem}
+.shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+.keypad{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.keypad button{background:#fff;border-radius:18px;min-height:66px;font-size:1.9rem;font-weight:700;box-shadow:0 5px 0 rgba(36,22,79,.18)}
+.keypad button:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(36,22,79,.18)}
+.keypad button.sym{background:#efe8ff;color:var(--purple)}
+.keypad button.del{background:#ffe1e3;color:var(--red)}
+.keypad .check{grid-column:span 2;background:var(--green);color:#fff;font-size:1.5rem;box-shadow:0 5px 0 #11904c}
+.choices{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.choices button{border-radius:20px;min-height:84px;font-size:1.7rem;font-weight:700;color:#fff;box-shadow:0 6px 0 rgba(36,22,79,.25);border:4px solid transparent}
+.choices button.sel{border-color:#fff;transform:scale(1.04)}
+.helpbar{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.helpbar .btn{padding:10px 8px;font-size:1rem;min-height:58px;line-height:1.15}
 .hints{display:grid;gap:8px}
-.hint{background:var(--gold-soft);border-radius:14px;padding:10px 14px;font-size:1.05rem}
-.hint b{color:inherit}
-.steps{background:var(--soft);border-radius:14px;padding:12px 16px;display:grid;gap:6px}
-.steps ol{margin:0;padding-left:22px;display:grid;gap:6px}
-.fb{border-radius:16px;padding:14px 16px;display:grid;gap:8px;font-size:1.1rem}
-.fb.good{background:var(--good-soft)} .fb.bad{background:var(--bad-soft)} .fb.try{background:var(--gold-soft)}
-.fb h3{font-size:1.3rem}
-.toast{position:fixed;left:50%;top:calc(16px + env(safe-area-inset-top));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:999px;font-weight:800;z-index:20;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:calc(100% - 32px);text-align:center}
-.modal{position:fixed;inset:0;background:rgba(10,20,40,.5);z-index:30;display:grid;place-items:center;padding:16px}
-.modal .card{max-width:560px;width:100%;max-height:85vh;overflow:auto}
+.hint{background:#fff6d6;border-radius:16px;padding:10px 14px;font-size:1.1rem;border:2px solid var(--yellow)}
+.steps{background:#eef4ff;border-radius:16px;padding:12px 16px;display:grid;gap:6px;border:2px solid #b9cdff}
+.steps ol{margin:0;padding-left:24px;display:grid;gap:6px}
+.fb{border-radius:18px;padding:14px 16px;display:grid;gap:6px;font-size:1.15rem}
+.fb.good{background:#d9f9e7;border:3px solid var(--green)} .fb.bad{background:#ffe3e4;border:3px solid var(--red)} .fb.try{background:#fff3cf;border:3px solid var(--yellow)}
+.fb h3{font-size:1.45rem}
+.nudge{position:absolute;right:12px;top:-14px;transform:translateY(-100%);background:#fff;border:3px solid var(--purple);border-radius:20px;padding:10px 14px;display:grid;gap:8px;max-width:300px;z-index:2;box-shadow:0 8px 20px rgba(36,22,79,.25);animation:pop .35s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pop{from{transform:translateY(-100%) scale(.6);opacity:0}to{transform:translateY(-100%) scale(1);opacity:1}}
+/* overlays */
+.tick{position:fixed;inset:0;display:grid;place-items:center;z-index:40;pointer-events:none}
+.tick svg{width:min(52vw,320px);height:auto;animation:tickpop 1.1s cubic-bezier(.2,1.5,.4,1) forwards}
+@keyframes tickpop{0%{transform:scale(.2) rotate(-20deg);opacity:0}25%{transform:scale(1.1) rotate(4deg);opacity:1}45%{transform:scale(1)}80%{opacity:1}100%{transform:scale(1.05);opacity:0}}
+.tick .path{stroke-dasharray:140;stroke-dashoffset:140;animation:draw .45s .15s ease-out forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:39}
+.toast{position:fixed;left:50%;top:calc(18px + env(safe-area-inset-top));transform:translateX(-50%);background:var(--yellow);color:var(--ink);padding:12px 22px;border-radius:999px;font-weight:700;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:calc(100% - 32px);text-align:center;animation:pop2 .35s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pop2{from{transform:translateX(-50%) scale(.5)}to{transform:translateX(-50%) scale(1)}}
+.modal{position:fixed;inset:0;background:rgba(36,22,79,.55);z-index:30;display:grid;place-items:center;padding:16px}
+.modal .card{max-width:580px;width:100%;max-height:86vh;overflow:auto}
 .badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
-.badge{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;display:grid;justify-items:center;text-align:center;gap:6px}
-.badge svg{width:56px;height:56px}
-.badge.locked{opacity:.4;filter:grayscale(1)}
-.badge small{color:var(--muted);font-size:.8rem}
+.badge{background:#fff;border-radius:20px;padding:14px;display:grid;justify-items:center;text-align:center;gap:6px;box-shadow:0 6px 0 rgba(36,22,79,.12)}
+.badge svg{width:64px;height:64px}
+.badge.locked{opacity:.45;filter:grayscale(1)}
+.badge small{color:var(--muted);font-size:.85rem}
 table{border-collapse:collapse;width:100%;font-size:.95rem}
 th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
 th{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
 .tw{overflow-x:auto}
 .code{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.8rem;white-space:nowrap}
-textarea{width:100%;min-height:90px;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:10px;font-size:.8rem}
-input[type=text],input[type=password],input[type=number]{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:10px 12px;width:100%}
+textarea{width:100%;min-height:90px;border:2px solid var(--line);background:var(--soft);border-radius:14px;padding:10px;font-size:.8rem}
+input[type=text],input[type=password]{border:2px solid var(--line);background:var(--soft);border-radius:14px;padding:10px 12px;width:100%}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 0}
+.switch{width:64px;height:36px;border-radius:999px;background:#d8d0f2;position:relative;flex:none;transition:background .2s}
+.switch::after{content:"";position:absolute;top:4px;left:4px;width:28px;height:28px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+.switch[aria-checked="true"]{background:var(--green)} .switch[aria-checked="true"]::after{left:32px}
 .lesson li{margin-bottom:8px}
-.big-num{font-size:2.4rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+.big-num{font-size:2.6rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+.statcard{color:#fff;box-shadow:0 8px 0 rgba(36,22,79,.18)}
+.statcard .muted{color:rgba(255,255,255,.85)}
+.bob{animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@media (prefers-reduced-motion:reduce){.bob,.shake,.tick svg,.nudge,.toast{animation:none}.tick svg{opacity:1}}
 </style>
 </head>
 <body>
 <main class="app" id="app"></main>
 <nav class="tabs" id="tabs" aria-label="Sections">
-  <button data-tab="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Home</button>
-  <button data-tab="learn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/><path d="M9 8h6M9 12h4"/></svg>Learn</button>
-  <button data-tab="trophies"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>Trophies</button>
-  <button data-tab="parents"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M17 4.5a3.5 3.5 0 0 1 0 7M21.5 20a6.5 6.5 0 0 0-4-6"/></svg>Grown-ups</button>
+  <button data-tab="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Home</button>
+  <button data-tab="learn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/><path d="M9 8h6M9 12h4"/></svg>Learn</button>
+  <button data-tab="trophies"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>Trophies</button>
+  <button data-tab="parents"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M17 4.5a3.5 3.5 0 0 1 0 7M21.5 20a6.5 6.5 0 0 0-4-6"/></svg>Grown-ups</button>
 </nav>
 <section class="qscreen" id="qscreen" hidden></section>
+<canvas id="confetti" hidden></canvas>
 <script src="engine.js"></script>
 <script>
 (function () {
@@ -156,27 +187,119 @@ input[type=text],input[type=password],input[type=number]{border:1px solid var(--
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const md = s => esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
   const fmtSec = s => { s = Math.max(0, Math.round(s)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
+  const rnd = a => a[Math.floor(Math.random() * a.length)];
+  const COLORS = ["#2f6bff", "#ff4fa3", "#1fc46b", "#ff8a3d", "#8b5cf6", "#12c2c9", "#ffc93c", "#ff5a5f"];
+  const STRAND_COL = { "Number": "#2f6bff", "Algebra": "#8b5cf6", "Measurement": "#ff8a3d", "Space": "#12c2c9", "Statistics": "#ff4fa3", "Working mathematically": "#1fc46b" };
 
   /* ---------- storage ---------- */
   let S = null;
   try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) { S = null; }
   if (!S || S.v !== 1) S = M.newState();
-  // keep state in sync with any new skills added in later versions
   M.SKILLS.forEach(s => { if (!S.skills[s.id]) S.skills[s.id] = { level: 2, mastery: 40, seen: 0, correct: 0, recent: [], lastSeen: null, levelUps: 0 }; });
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage blocked: progress lasts until the app closes */ } }
+  if (S.sound == null) S.sound = true;
+  if (S.voice == null) S.voice = true;
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage blocked */ } }
   try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
 
-  let tab = "home", parentsOpen = false;
+  /* ---------- sound effects (made in code, no files) ---------- */
+  let ac = null;
+  function audio() { if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { ac = null; } } if (ac && ac.state === "suspended") ac.resume(); return ac; }
+  function tone(freq, start, dur, type = "triangle", vol = 0.18) {
+    const a = audio(); if (!a) return;
+    const o = a.createOscillator(), g = a.createGain(), t = a.currentTime + start;
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(a.destination); o.start(t); o.stop(t + dur + 0.05);
+  }
+  const SFX = {
+    tap: () => tone(880, 0, 0.06, "sine", 0.08),
+    right: () => { [523, 659, 784, 1047].forEach((f, i) => tone(f, i * 0.09, 0.25, "triangle", 0.2)); tone(1568, 0.38, 0.35, "sine", 0.12); },
+    wrong: () => { tone(330, 0, 0.18, "sawtooth", 0.07); tone(247, 0.16, 0.28, "sawtooth", 0.07); },
+    hint: () => { tone(660, 0, 0.1, "sine", 0.1); tone(990, 0.08, 0.15, "sine", 0.1); },
+    level: () => { [392, 523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, i * 0.08, 0.3, "square", 0.07)); },
+    finish: () => { [523, 659, 784, 659, 784, 1047].forEach((f, i) => tone(f, i * 0.13, 0.3, "triangle", 0.2)); },
+  };
+  const sfx = name => { if (S.sound) try { SFX[name](); } catch (e) {} };
 
-  /* ---------- small UI helpers ---------- */
-  function toast(msg) { const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; document.body.append(t); setTimeout(() => t.remove(), 2600); }
-  function starSvg(on) { return `<svg class="star" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17l-5.9 3.3 1.3-6.5L2.5 9.3l6.6-.8z" fill="${on ? "var(--gold)" : "var(--line)"}"/></svg>`; }
-  const badgeSvg = (i) => { const hues = ["#3657e8", "#12925f", "#e6a700", "#d6452f", "#8a4fe0", "#0e93b5"]; const c = hues[i % hues.length]; return `<svg viewBox="0 0 56 56"><circle cx="28" cy="24" r="18" fill="${c}"/><circle cx="28" cy="24" r="12" fill="none" stroke="#fff" stroke-width="3" opacity=".7"/><path d="M18 38l-4 14 8-4 6 6 2-14M38 38l4 14-8-4-6 6" fill="${c}" opacity=".8"/><path d="M28 16l2.6 5.2 5.7.8-4.1 4 1 5.7L28 29l-5.2 2.7 1-5.7-4.1-4 5.7-.8z" fill="#fff"/></svg>`; };
+  /* ---------- read aloud ---------- */
+  let voice = null;
+  function pickVoice() {
+    if (!("speechSynthesis" in window)) return;
+    const vs = speechSynthesis.getVoices();
+    voice = vs.find(v => /en-AU/i.test(v.lang) && /karen|lee|catherine/i.test(v.name)) || vs.find(v => /en-AU/i.test(v.lang)) || vs.find(v => /en-GB/i.test(v.lang)) || vs.find(v => /^en/i.test(v.lang)) || null;
+  }
+  if ("speechSynthesis" in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+  function speechText(s) {
+    return String(s).replace(/\*\*/g, "").replace(/[  ]/g, "")
+      .replace(/☐/g, " the box ")
+      .replace(/(\d+) (\d+)\/(\d+)/g, "$1 and $2 over $3")
+      .replace(/(\d+)\/(\d+)/g, "$1 over $2")
+      .replace(/(\d{1,2}):(\d{2}) ?(am|pm)/gi, (m, h, mm, ap) => `${h} ${mm === "00" ? "" : mm} ${ap.split("").join(" ")}`)
+      .replace(/(\d{1,2}):(\d{2})/g, (m, h, mm) => `${h} ${mm === "00" ? "hundred" : mm}`)
+      .replace(/(\d+) h (\d+) min/g, "$1 hours $2 minutes")
+      .replace(/×/g, " times ").replace(/÷/g, " divided by ").replace(/−/g, " minus ").replace(/\+/g, " plus ").replace(/=/g, " equals ")
+      .replace(/cm²/g, " square centimetres").replace(/m²/g, " square metres").replace(/cm³/g, " cubic centimetres")
+      .replace(/(\d)°/g, "$1 degrees").replace(/%/g, " percent").replace(/…/g, " ").replace(/\be\.g\./g, "for example")
+      .replace(/\s+/g, " ").trim();
+  }
+  function say(text, { queue = false } = {}) {
+    if (!S.voice || !("speechSynthesis" in window)) return;
+    try {
+      if (!queue) speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(speechText(text));
+      if (voice) u.voice = voice; u.lang = voice ? voice.lang : "en-AU"; u.rate = 0.95; u.pitch = 1.1;
+      speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+  const hush = () => { try { speechSynthesis.cancel(); } catch (e) {} };
+  function readQuestion(q) {
+    let t = q.prompt;
+    if (q.answer.t === "choice") t += ". Is it " + q.answer.o.join(", or ") + "?";
+    say(t);
+  }
+
+  /* ---------- Bolt the robot ---------- */
+  function mascot(mood = "happy", cls = "") {
+    const mouth = { happy: '<path d="M44 74 Q60 88 76 74" stroke="#24164f" stroke-width="5" fill="none" stroke-linecap="round"/>', wow: '<ellipse cx="60" cy="78" rx="9" ry="11" fill="#24164f"/>', think: '<path d="M46 78 H74" stroke="#24164f" stroke-width="5" stroke-linecap="round"/>', sad: '<path d="M46 82 Q60 70 74 82" stroke="#24164f" stroke-width="5" fill="none" stroke-linecap="round"/>' }[mood];
+    const eyes = mood === "happy" ? '<path d="M36 54 Q44 44 52 54" stroke="#24164f" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M68 54 Q76 44 84 54" stroke="#24164f" stroke-width="5" fill="none" stroke-linecap="round"/>' : `<circle cx="44" cy="52" r="8" fill="#24164f"/><circle cx="76" cy="52" r="8" fill="#24164f"/><circle cx="47" cy="49" r="3" fill="#fff"/><circle cx="79" cy="49" r="3" fill="#fff"/>`;
+    return `<svg class="mascot ${cls}" viewBox="0 0 120 120" aria-hidden="true"><line x1="60" y1="8" x2="60" y2="24" stroke="#24164f" stroke-width="4"/><circle cx="60" cy="8" r="7" fill="#ff4fa3"/><rect x="14" y="24" width="92" height="80" rx="30" fill="#12c2c9" stroke="#24164f" stroke-width="4"/><rect x="26" y="36" width="68" height="56" rx="22" fill="#e9fdff"/><circle cx="10" cy="64" r="8" fill="#ffc93c" stroke="#24164f" stroke-width="4"/><circle cx="110" cy="64" r="8" fill="#ffc93c" stroke="#24164f" stroke-width="4"/>${eyes}${mouth}<circle cx="34" cy="70" r="5" fill="#ff9ec9" opacity=".8"/><circle cx="86" cy="70" r="5" fill="#ff9ec9" opacity=".8"/></svg>`;
+  }
+  const JOKES = ["Why was six afraid of seven? Because seven eight nine!", "Why did the maths book look sad? It had too many problems.", "What's a maths teacher's favourite place? Times Square!", "Why is the obtuse angle always upset? Because it's never right!", "What do you call a number that can't sit still? A roamin' numeral!", "Why did the two fours skip lunch? They already eight!", "How do you stay warm in a cold room? Go to the corner, it's always ninety degrees!"];
+
+  /* ---------- confetti + big tick ---------- */
+  function confetti(n = 160) {
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) n = 30;
+    const c = $("#confetti"); c.hidden = false; const ctx = c.getContext("2d");
+    const W = c.width = innerWidth * devicePixelRatio, H = c.height = innerHeight * devicePixelRatio;
+    const ps = Array.from({ length: n }, () => ({ x: W / 2 + (Math.random() - 0.5) * W * 0.3, y: H * 0.45, vx: (Math.random() - 0.5) * 26 * devicePixelRatio, vy: (-Math.random() * 26 - 8) * devicePixelRatio, s: (6 + Math.random() * 8) * devicePixelRatio, r: Math.random() * 6, vr: (Math.random() - 0.5) * 0.4, c: rnd(COLORS), shape: Math.random() < 0.5 }));
+    const g = 0.9 * devicePixelRatio; let f = 0;
+    (function step() {
+      ctx.clearRect(0, 0, W, H);
+      ps.forEach(p => { p.vy += g; p.vx *= 0.99; p.x += p.vx; p.y += p.vy; p.r += p.vr; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.fillStyle = p.c; if (p.shape) ctx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); else { ctx.beginPath(); ctx.arc(0, 0, p.s / 2.5, 0, 7); ctx.fill(); } ctx.restore(); });
+      if (++f < 120) requestAnimationFrame(step); else { ctx.clearRect(0, 0, W, H); c.hidden = true; }
+    })();
+  }
+  function bigTick() {
+    const t = document.createElement("div"); t.className = "tick";
+    t.innerHTML = `<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="54" fill="#1fc46b" stroke="#fff" stroke-width="6"/><path class="path" d="M34 62 L52 80 L88 42" fill="none" stroke="#fff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    document.body.append(t); setTimeout(() => t.remove(), 1200);
+  }
+
+  let tab = "home", parentsOpen = false;
+  function toast(msg) { const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; document.body.append(t); setTimeout(() => t.remove(), 2800); }
+  function starSvg(on) { return `<svg class="star" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17l-5.9 3.3 1.3-6.5L2.5 9.3l6.6-.8z" fill="${on ? "#ffc93c" : "#e5defa"}" stroke="${on ? "#d9a514" : "#cfc5ef"}" stroke-width="1.2"/></svg>`; }
+  const badgeSvg = i => { const c = COLORS[i % COLORS.length]; return `<svg viewBox="0 0 56 56"><path d="M18 36l-4 16 8-4 6 6 2-16M38 36l4 16-8-4-6 6" fill="${c}" opacity=".75"/><circle cx="28" cy="24" r="19" fill="${c}" stroke="#fff" stroke-width="3"/><path d="M28 13l3.2 6.4 7 1-5.1 5 1.2 7L28 29l-6.3 3.4 1.2-7-5.1-5 7-1z" fill="#fff"/></svg>`; };
   const yearChip = l => `<span class="chip y${l}">${M.YEAR[l]}</span>`;
   function modal(html, onMount) {
     const m = document.createElement("div"); m.className = "modal"; m.innerHTML = `<div class="card" role="dialog" aria-modal="true">${html}</div>`;
-    m.addEventListener("click", e => { if (e.target === m || e.target.closest("[data-close]")) m.remove(); });
+    m.addEventListener("click", e => { if (e.target === m || e.target.closest("[data-close]")) { hush(); m.remove(); } });
     document.body.append(m); if (onMount) onMount(m); return m;
+  }
+  // show typed answers with thousands spacing: 1230000 → 1 230 000
+  function prettyInput(s) {
+    if (!/^\d+(\.\d*)?$/.test(s)) return esc(s);
+    const [i, d] = s.split(".");
+    return esc(i.replace(/\B(?=(\d{3})+(?!\d))/g, " ") + (d != null ? "." + d : ""));
   }
 
   /* ---------- day record ---------- */
@@ -190,110 +313,124 @@ input[type=text],input[type=password],input[type=number]{border:1px solid var(--
   function renderHome() {
     const d = todayRec(false);
     const n = d ? d.total : S.dailyCount, done = d ? d.i : 0;
-    const pct = n ? done / n : 0, C = 2 * Math.PI * 40;
+    const pct = n ? done / n : 0, C = 2 * Math.PI * 44;
     const rk = M.rank(S.points);
     const toNext = rk.next ? (S.points - rk.from) / (rk.next.at - rk.from) : 1;
-    // week strip Mon..Sun
     const now = new Date(), dow = (now.getDay() + 6) % 7;
     const week = Array.from({ length: 7 }, (_, i) => { const dt = new Date(now); dt.setDate(now.getDate() - dow + i); const key = M.today(dt); return { lab: "MTWTFSS"[i], on: S.days[key] && S.days[key].done, today: i === dow }; });
     const weakest = M.SKILLS.filter(s => s.id !== "puzzle").map(s => ({ s, st: S.skills[s.id] })).sort((a, b) => a.st.mastery - b.st.mastery).slice(0, 3);
-    let missionBtn, missionText;
-    if (!d) { missionBtn = `<button class="btn big" id="go">Start mission</button>`; missionText = `${n} problems are waiting. Ready?`; }
-    else if (!d.done) { missionBtn = `<button class="btn big" id="go">Keep going</button>`; missionText = `${done} of ${n} done. ${n - done} to go!`; }
-    else { missionBtn = `<button class="btn big" id="bonus">Bonus round (5 more)</button>`; missionText = `Mission complete: ${d.correct}/${d.total} right in ${fmtSec(d.timeSec)}.`; }
+    const hour = now.getHours(), greet = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+    let bubble, missionBtn, missionText;
+    if (!d) { bubble = `${greet}, ${S.name}! Your mission is ready. Let's smash it!`; missionBtn = `<button class="btn big blue" id="go">Start mission 🚀</button>`; missionText = `${n} problems, including brain-bending puzzles.`; }
+    else if (!d.done) { bubble = `Welcome back! ${n - done} to go. You've got this!`; missionBtn = `<button class="btn big blue" id="go">Keep going 🚀</button>`; missionText = `${done} of ${n} done.`; }
+    else { bubble = `Mission complete! ${d.correct} out of ${d.total}. Want a bonus round?`; missionBtn = `<button class="btn big pink" id="bonus">Bonus round ⚡</button>`; missionText = `${d.correct}/${d.total} right in ${fmtSec(d.timeSec)}.`; }
     $("#app").innerHTML = `
-      <div class="hello">
-        <div><p class="muted" style="margin:0">${new Date().toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "long" })}</p><h1>Hi ${esc(S.name)}!</h1></div>
-        <div class="stat"><span class="chip">🔥 ${S.streak.count} day streak</span><span class="chip">⭐ ${S.points.toLocaleString("en-AU")} pts</span><span class="chip">${rk.name}</span></div>
+      <div class="hero">
+        <button id="bolt" aria-label="Tap Bolt for a joke">${mascot("happy", "bob")}</button>
+        <div style="display:grid;gap:10px;min-width:0">
+          <h1 class="white">Hi ${esc(S.name)}!</h1>
+          <div class="bubble" id="boltSays">${esc(bubble)}</div>
+        </div>
       </div>
+      <div class="row hud"><span class="chip">🔥 ${S.streak.count} day streak</span><span class="chip">⭐ ${S.points.toLocaleString("en-AU")} points</span><span class="chip">🏅 ${rk.name}</span></div>
       <section class="card mission">
         <div class="row between" style="flex-wrap:nowrap">
           <div style="display:grid;gap:8px;min-width:0">
-            <p class="muted" style="margin:0;font-weight:800;text-transform:uppercase;letter-spacing:.08em;font-size:.8rem">Today's mission</p>
-            <h2 style="font-size:1.7rem">${d && d.done ? "Done! Great work." : `${n} maths problems`}</h2>
-            <p style="margin:0">${missionText}</p>
+            <span style="font-weight:700;text-transform:uppercase;letter-spacing:.1em;font-size:.85rem">Today's mission</span>
+            <h2 style="font-size:2rem">${d && d.done ? "Mission complete!" : `${n} maths problems`}</h2>
+            <p style="margin:0;font-size:1.1rem">${missionText}</p>
             ${d && d.done ? `<div class="stars">${[1, 2, 3].map(i => starSvg(i <= (d.stars || 0))).join("")}</div>` : ""}
           </div>
-          <svg class="ring" viewBox="0 0 96 96" aria-label="${done} of ${n} done"><circle class="bgc" cx="48" cy="48" r="40"/><circle class="fg" cx="48" cy="48" r="40" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - pct)}" transform="rotate(-90 48 48)"/><text x="48" y="55" text-anchor="middle">${done}/${n}</text></svg>
+          <svg class="ring" viewBox="0 0 110 110" aria-label="${done} of ${n} done"><circle class="bgc" cx="55" cy="55" r="44"/><circle class="fg" cx="55" cy="55" r="44" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - pct)}" transform="rotate(-90 55 55)"/><text x="55" y="63" text-anchor="middle">${done}/${n}</text></svg>
         </div>
         <div>${missionBtn}</div>
       </section>
       <div class="grid2">
         <section class="card">
-          <h3>This week</h3>
-          <div class="week">${week.map(w => `<span class="${w.on ? "on" : ""} ${w.today ? "today" : ""}">${w.lab}</span>`).join("")}</div>
-          <p class="muted" style="margin:0">${S.streak.count ? `Finish today's mission to keep your ${S.streak.count}-day streak going.` : "Finish a mission every day to build a streak."}</p>
+          <h3>🔥 This week</h3>
+          <div class="week">${week.map(w => `<span class="${w.on ? "on" : ""} ${w.today ? "today" : ""}">${w.on ? "✓" : w.lab}</span>`).join("")}</div>
+          <p class="muted" style="margin:0">${S.streak.count ? `Finish today's mission to keep your ${S.streak.count}-day streak alive!` : "Finish a mission every day to build a streak."}</p>
         </section>
         <section class="card">
-          <div class="row between"><h3>Rank: ${rk.name}</h3><span class="muted">${rk.next ? `${(rk.next.at - S.points).toLocaleString("en-AU")} pts to ${rk.next.name}` : "Top rank!"}</span></div>
-          <div class="bar"><i style="width:${Math.round(toNext * 100)}%"></i></div>
-          <p class="muted" style="margin:0">Best run: ${S.bestInARow} right in a row · Puzzles solved: ${S.puzzlesSolved}</p>
+          <div class="row between"><h3>🏅 ${rk.name}</h3><span class="muted">${rk.next ? `${(rk.next.at - S.points).toLocaleString("en-AU")} pts to ${rk.next.name}` : "Top rank!"}</span></div>
+          <div class="bar"><i style="width:${Math.max(3, Math.round(toNext * 100))}%"></i></div>
+          <p class="muted" style="margin:0">Best run: ${S.bestInARow} in a row · Puzzles solved: ${S.puzzlesSolved}</p>
         </section>
       </div>
       <section class="card">
-        <div class="row between"><h3>Level these up</h3><button class="btn" data-tab-go="learn">All skills</button></div>
-        <div>${weakest.map(w => `<div class="skillrow"><div class="grow"><b>${w.s.name}</b><div class="bar"><i style="width:${w.st.mastery}%"></i></div></div>${yearChip(w.st.level)}<button class="btn primary" data-practise="${w.s.id}">Practise</button></div>`).join("")}</div>
+        <div class="row between"><h3>💪 Power up these skills</h3><button class="btn" data-tab-go="learn">All skills</button></div>
+        <div>${weakest.map(w => `<div class="skillrow"><span class="dot" style="background:${STRAND_COL[w.s.strand]}">${w.s.name[0]}</span><div class="grow"><b>${w.s.name}</b><div class="bar"><i style="width:${Math.max(3, w.st.mastery)}%"></i></div></div>${yearChip(w.st.level)}<button class="btn green" data-practise="${w.s.id}">Practise</button></div>`).join("")}</div>
       </section>`;
-    const go = $("#go"); if (go) go.onclick = () => startDaily();
-    const bonus = $("#bonus"); if (bonus) bonus.onclick = () => startPractice(null);
+    const go = $("#go"); if (go) go.onclick = () => { audio(); startDaily(); };
+    const bonus = $("#bonus"); if (bonus) bonus.onclick = () => { audio(); startPractice(null); };
+    $("#bolt").onclick = () => { const j = rnd(JOKES); $("#boltSays").textContent = j; audio(); sfx("hint"); say(j); };
   }
 
   /* ---------- LEARN ---------- */
   function renderLearn() {
     const strands = [...new Set(M.SKILLS.map(s => s.strand))];
-    $("#app").innerHTML = `<h1>Learn</h1><p class="muted" style="margin:-8px 0 0">Pick a skill to see how it works, watch an example, then have a go.</p>` +
-      strands.map(str => `<section class="card"><h3>${str}</h3><div>${M.SKILLS.filter(s => s.strand === str).map(s => { const st = S.skills[s.id]; return `<div class="skillrow"><div class="grow"><b>${s.name}</b><div class="bar"><i style="width:${st.mastery}%"></i></div></div>${yearChip(st.level)}<button class="btn" data-lesson="${s.id}">Learn</button><button class="btn primary" data-practise="${s.id}">Practise</button></div>`; }).join("")}</div></section>`).join("");
+    $("#app").innerHTML = `<div class="hero"><div class="mascot-wrap">${mascot("wow", "bob")}</div><div style="display:grid;gap:8px"><h1 class="white">Learn</h1><div class="bubble">Pick a skill. I'll show you how it works, then you have a go!</div></div></div>` +
+      strands.map(str => `<section class="card"><h3 style="color:${STRAND_COL[str]}">${str}</h3><div>${M.SKILLS.filter(s => s.strand === str).map(s => { const st = S.skills[s.id]; return `<div class="skillrow"><span class="dot" style="background:${STRAND_COL[str]}">${s.name[0]}</span><div class="grow"><b>${s.name}</b><div class="bar"><i style="width:${Math.max(3, st.mastery)}%"></i></div></div>${yearChip(st.level)}<button class="btn yellow" data-lesson="${s.id}">Learn</button><button class="btn green" data-practise="${s.id}">Practise</button></div>`; }).join("")}</div></section>`).join("");
+    document.querySelectorAll(".mascot-wrap svg").forEach(s => { s.style.width = "110px"; s.style.height = "110px"; });
   }
   function openLesson(id) {
+    audio();
     const sk = M.SKILL[id], st = S.skills[id];
     const q = M.generate(id, st.level);
     let shown = 0;
-    const m = modal(`<div class="row between"><h2>${sk.name}</h2>${yearChip(st.level)}</div>
-      <h3>How it works</h3><ul class="lesson">${M.LESSONS[id].map(x => `<li>${md(x)}</li>`).join("")}</ul>
-      <h3>Watch an example</h3><div class="prompt" style="font-size:1.2rem">${md(q.prompt)}</div>${diagram(q.diagram)}
+    modal(`<div class="row between"><h2>${sk.name}</h2>${yearChip(st.level)}</div>
+      <div class="row" style="flex-wrap:nowrap;align-items:flex-start">${mascot("happy")}<div><h3>How it works</h3><ul class="lesson">${M.LESSONS[id].map(x => `<li>${md(x)}</li>`).join("")}</ul></div></div>
+      <button class="speak" id="readLesson"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 10v4h4l5 4V6L8 10z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg>Read it to me</button>
+      <h3>Watch an example</h3><div class="prompt" style="font-size:1.3rem">${md(q.prompt)}</div>${diagram(q.diagram)}
       <div class="steps"><ol id="lsteps"></ol></div>
-      <div class="row"><button class="btn" id="nextStep">Show first step</button><button class="btn primary" id="tryNow">Try 5 myself</button><button class="btn" data-close>Close</button></div>`, mm => {
+      <div class="row"><button class="btn purple" id="nextStep">Show the first step</button><button class="btn green" id="tryNow">Try 5 myself</button><button class="btn" data-close>Close</button></div>`, mm => {
+      mm.querySelectorAll(".mascot").forEach(s => { s.style.width = "70px"; s.style.height = "70px"; s.style.flex = "none"; });
+      mm.querySelector("#readLesson").onclick = () => say(M.LESSONS[id].join(" "));
       const nx = mm.querySelector("#nextStep"), ol = mm.querySelector("#lsteps");
-      nx.onclick = () => { if (shown < q.steps.length) { const li = document.createElement("li"); li.innerHTML = md(q.steps[shown]); ol.append(li); shown++; } nx.textContent = shown >= q.steps.length ? "Done! Try one yourself" : "Next step"; if (shown >= q.steps.length) nx.disabled = true; };
-      mm.querySelector("#tryNow").onclick = () => { mm.remove(); startPractice(id); };
+      nx.onclick = () => {
+        if (shown === 0) say(q.prompt);
+        if (shown < q.steps.length) { const li = document.createElement("li"); li.innerHTML = md(q.steps[shown]); ol.append(li); say(q.steps[shown], { queue: shown === 0 }); sfx("tap"); shown++; }
+        nx.textContent = shown >= q.steps.length ? "Done! Now you try" : "Next step";
+        if (shown >= q.steps.length) nx.disabled = true;
+      };
+      mm.querySelector("#tryNow").onclick = () => { hush(); mm.remove(); startPractice(id); };
     });
-    return m;
   }
 
   /* ---------- TROPHIES ---------- */
   function renderTrophies() {
     const got = Object.keys(S.badges).length;
-    $("#app").innerHTML = `<h1>Trophies</h1>
+    $("#app").innerHTML = `<div class="hero">${mascot("wow", "bob")}<div style="display:grid;gap:8px"><h1 class="white">Trophies</h1><div class="bubble">You've won ${got} of ${M.BADGES.length} badges. Keep going!</div></div></div>
       <div class="grid2">
-        <section class="card"><span class="muted">Points</span><span class="big-num">${S.points.toLocaleString("en-AU")}</span><span class="muted">Rank: ${M.rank(S.points).name}</span></section>
-        <section class="card"><span class="muted">Streak</span><span class="big-num">${S.streak.count} day${S.streak.count === 1 ? "" : "s"}</span><span class="muted">Best run: ${S.bestInARow} right in a row</span></section>
-        <section class="card"><span class="muted">Fastest mission (80%+ right)</span><span class="big-num">${S.bestTime ? fmtSec(S.bestTime) : "–"}</span><span class="muted">Puzzles solved: ${S.puzzlesSolved}</span></section>
+        <section class="card statcard" style="background:var(--blue)"><span class="muted">Points</span><span class="big-num">⭐ ${S.points.toLocaleString("en-AU")}</span><span class="muted">Rank: ${M.rank(S.points).name}</span></section>
+        <section class="card statcard" style="background:var(--orange)"><span class="muted">Streak</span><span class="big-num">🔥 ${S.streak.count}</span><span class="muted">Best run: ${S.bestInARow} right in a row</span></section>
+        <section class="card statcard" style="background:var(--pink)"><span class="muted">Fastest mission</span><span class="big-num">⏱ ${S.bestTime ? fmtSec(S.bestTime) : "–"}</span><span class="muted">Puzzles solved: ${S.puzzlesSolved}</span></section>
       </div>
       <section class="card"><h3>Badges · ${got} of ${M.BADGES.length}</h3>
       <div class="badges">${M.BADGES.map((b, i) => `<div class="badge ${S.badges[b.id] ? "" : "locked"}">${badgeSvg(i)}<b>${b.name}</b><small>${b.desc}</small>${S.badges[b.id] ? `<small>Won ${new Date(S.badges[b.id]).toLocaleDateString("en-AU", { day: "numeric", month: "short" })}</small>` : ""}</div>`).join("")}</div></section>
-      <section class="card"><h3>Ranks</h3><div class="row">${M.RANKS.map(r => `<span class="chip" style="${S.points >= r[0] ? "background:var(--brand);color:var(--on-brand)" : ""}">${r[1]} · ${r[0].toLocaleString("en-AU")}</span>`).join("")}</div></section>`;
+      <section class="card"><h3>Ranks</h3><div class="row">${M.RANKS.map((r, i) => `<span class="chip" style="${S.points >= r[0] ? `background:${COLORS[i % COLORS.length]};color:#fff` : ""}">${r[1]} · ${r[0].toLocaleString("en-AU")}</span>`).join("")}</div></section>`;
+    document.querySelectorAll(".hero > svg").forEach(s => { s.style.width = "110px"; s.style.height = "110px"; s.style.flex = "none"; });
   }
 
   /* ---------- GROWN-UPS ---------- */
   function renderParents() {
     if (S.pin && !parentsOpen) {
-      $("#app").innerHTML = `<h1>Grown-ups</h1><section class="card" style="max-width:420px"><h3>Enter PIN</h3><input type="password" inputmode="numeric" id="pin" maxlength="8" autocomplete="off"><button class="btn primary" id="pinGo">Open</button><p class="muted" id="pinMsg" style="margin:0"></p></section>`;
+      $("#app").innerHTML = `<h1 class="white">Grown-ups</h1><section class="card" style="max-width:420px"><h3>Enter PIN</h3><input type="password" inputmode="numeric" id="pin" maxlength="8" autocomplete="off"><button class="btn blue" id="pinGo">Open</button><p class="muted" id="pinMsg" style="margin:0"></p></section>`;
       const go = () => { if ($("#pin").value === S.pin) { parentsOpen = true; renderParents(); } else { $("#pinMsg").textContent = "That PIN isn't right."; } };
       $("#pinGo").onclick = go; $("#pin").onkeydown = e => { if (e.key === "Enter") go(); };
       return;
     }
     const rep = M.report(S);
-    // last 14 days
     const days = []; for (let i = 13; i >= 0; i--) { const dt = new Date(); dt.setDate(dt.getDate() - i); days.push(M.today(dt)); }
-    const perDay = days.map(d => { const h = S.history.filter(x => x.d === d); return { d, n: h.length, ok: h.filter(x => x.ok).length, done: S.days[d] && S.days[d].done }; });
+    const perDay = days.map(d => { const h = S.history.filter(x => x.d === d); return { d, n: h.length, ok: h.filter(x => x.ok).length }; });
     const maxN = Math.max(10, ...perDay.map(p => p.n));
     const W = 560, H = 160, bw = W / 14;
     const chart = `<svg viewBox="0 0 ${W} ${H + 24}" role="img" aria-label="Questions answered in the last 14 days">
       ${[0.5, 1].map(f => `<line x1="0" x2="${W}" y1="${H - f * H}" y2="${H - f * H}" stroke="var(--line)"/>`).join("")}
-      ${perDay.map((p, i) => { const h = (p.n / maxN) * H, ho = (p.ok / maxN) * H; return `<rect x="${i * bw + 6}" y="${H - h}" width="${bw - 12}" height="${h}" rx="4" fill="var(--bad-soft)"/><rect x="${i * bw + 6}" y="${H - ho}" width="${bw - 12}" height="${ho}" rx="4" fill="var(--good)"/>${p.n ? `<text x="${i * bw + bw / 2}" y="${H - h - 4}" text-anchor="middle" font-size="11" fill="var(--muted)">${Math.round(100 * p.ok / p.n)}%</text>` : ""}<text x="${i * bw + bw / 2}" y="${H + 16}" text-anchor="middle" font-size="11" fill="var(--muted)">${new Date(p.d).getDate()}</text>`; }).join("")}
+      ${perDay.map((p, i) => { const h = (p.n / maxN) * H, ho = (p.ok / maxN) * H; return `<rect x="${i * bw + 6}" y="${H - h}" width="${bw - 12}" height="${h}" rx="4" fill="#ffd0d2"/><rect x="${i * bw + 6}" y="${H - ho}" width="${bw - 12}" height="${ho}" rx="4" fill="var(--green)"/>${p.n ? `<text x="${i * bw + bw / 2}" y="${H - h - 4}" text-anchor="middle" font-size="11" fill="var(--muted)">${Math.round(100 * p.ok / p.n)}%</text>` : ""}<text x="${i * bw + bw / 2}" y="${H + 16}" text-anchor="middle" font-size="11" fill="var(--muted)">${new Date(p.d).getDate()}</text>`; }).join("")}
     </svg>`;
     const total = S.history.length, right = S.history.filter(x => x.ok).length;
-    $("#app").innerHTML = `<h1>Grown-ups</h1>
+    $("#app").innerHTML = `<h1 class="white">Grown-ups</h1>
       <div class="grid2">
         <section class="card"><span class="muted">Questions answered</span><span class="big-num">${total}</span><span class="muted">${total ? Math.round(100 * right / total) : 0}% right overall</span></section>
         <section class="card"><span class="muted">Missions finished</span><span class="big-num">${Object.values(S.days).filter(d => d.done).length}</span><span class="muted">Streak ${S.streak.count} · started ${new Date(S.created).toLocaleDateString("en-AU")}</span></section>
@@ -302,23 +439,31 @@ input[type=text],input[type=password],input[type=number]{border:1px solid var(--
       <section class="card"><h3>Progress by NSW syllabus outcome</h3>
         <p class="muted" style="margin:0">Levels: Year 4 = late Stage 2, Year 5 = Stage 3, Year 6+ = extension. Mastery weighs recent answers and help used. Accuracy is the last 20 answers.</p>
         <div class="tw"><table><thead><tr><th>Outcome</th><th>Skill</th><th>Level</th><th>Mastery</th><th>Accuracy</th><th>Status</th></tr></thead><tbody>
-        ${rep.map(r => `<tr><td class="code">${r.code}</td><td>${r.name}</td><td>${yearChip(r.level)}</td><td style="min-width:110px"><div class="bar"><i style="width:${r.mastery}%"></i></div></td><td>${r.acc == null ? "–" : r.acc + "%"}</td><td>${r.status}</td></tr>`).join("")}
+        ${rep.map(r => `<tr><td class="code">${r.code}</td><td>${r.name}</td><td>${yearChip(r.level)}</td><td style="min-width:110px"><div class="bar"><i style="width:${Math.max(3, r.mastery)}%"></i></div></td><td>${r.acc == null ? "–" : r.acc + "%"}</td><td>${r.status}</td></tr>`).join("")}
         </tbody></table></div></section>
+      <section class="card"><h3>Sound</h3>
+        <div class="toggle"><span>Read questions out loud</span><button class="switch" role="switch" id="tVoice" aria-checked="${S.voice}" aria-label="Read questions out loud"></button></div>
+        <div class="toggle"><span>Sound effects</span><button class="switch" role="switch" id="tSound" aria-checked="${S.sound}" aria-label="Sound effects"></button></div>
+        <button class="btn" id="testVoice">Test the voice</button>
+      </section>
       <section class="card"><h3>Settings</h3>
         <label class="muted">Name<input type="text" id="setName" value="${esc(S.name)}"></label>
         <label class="muted">Daily problems: <b id="dcLabel">${S.dailyCount}</b><input type="range" id="setCount" min="10" max="20" value="${S.dailyCount}" style="width:100%"></label>
         <div class="row"><span class="muted">Set every skill to:</span>${[1, 2, 3].map(l => `<button class="btn" data-setlevel="${l}">${M.YEAR[l]}</button>`).join("")}</div>
-        <div class="row"><label class="muted" style="flex:1">Grown-ups PIN (blank = none)<input type="password" inputmode="numeric" id="setPin" maxlength="8" value="${esc(S.pin || "")}"></label></div>
-        <div class="row"><button class="btn primary" id="saveSet">Save settings</button><span class="muted" id="setMsg"></span></div>
+        <label class="muted">Grown-ups PIN (blank = none)<input type="password" inputmode="numeric" id="setPin" maxlength="8" value="${esc(S.pin || "")}"></label>
+        <div class="row"><button class="btn blue" id="saveSet">Save settings</button><span class="muted" id="setMsg"></span></div>
       </section>
       <section class="card"><h3>Backup</h3>
         <p class="muted" style="margin:0">Progress is saved on this iPad only. Copy the backup code now and then (paste it into Notes or an email). To move to another device, paste it below and press Restore.</p>
         <div class="row"><button class="btn" id="mkBackup">Make backup code</button><button class="btn" id="cpBackup" hidden>Copy</button></div>
         <textarea id="backup" placeholder="Backup code appears here, or paste one to restore"></textarea>
-        <div class="row"><button class="btn" id="restore">Restore from code</button><button class="btn" id="resetAll" style="color:var(--bad)">Reset all progress</button><span class="muted" id="bkMsg"></span></div>
+        <div class="row"><button class="btn" id="restore">Restore from code</button><button class="btn" id="resetAll" style="color:var(--red)">Reset all progress</button><span class="muted" id="bkMsg"></span></div>
       </section>`;
+    const sw = (id, k) => { const b = $(id); b.onclick = () => { S[k] = !S[k]; b.setAttribute("aria-checked", S[k]); save(); if (!S.voice) hush(); }; };
+    sw("#tVoice", "voice"); sw("#tSound", "sound");
+    $("#testVoice").onclick = () => { audio(); sfx("right"); say(`Hi ${S.name}! What is 3 times 4?`); };
     $("#setCount").oninput = e => $("#dcLabel").textContent = e.target.value;
-    $("#saveSet").onclick = () => { S.name = $("#setName").value.trim() || "Cooper"; S.dailyCount = +$("#setCount").value; S.pin = $("#setPin").value.trim() || null; save(); $("#setMsg").textContent = "Saved. New daily count starts with tomorrow's mission."; };
+    $("#saveSet").onclick = () => { S.name = $("#setName").value.trim() || "Cooper"; S.dailyCount = +$("#setCount").value; S.pin = $("#setPin").value.trim() || null; save(); $("#setMsg").textContent = "Saved. The new daily count starts with tomorrow's mission."; };
     document.querySelectorAll("[data-setlevel]").forEach(b => b.onclick = () => { const l = +b.dataset.setlevel; M.SKILLS.forEach(s => { if (s.id !== "puzzle") { S.skills[s.id].level = l; S.skills[s.id].recent = []; } }); save(); renderParents(); toast(`All skills set to ${M.YEAR[l]}`); });
     const enc = o => btoa(unescape(encodeURIComponent(JSON.stringify(o))));
     $("#mkBackup").onclick = () => { $("#backup").value = enc(S); $("#cpBackup").hidden = false; $("#bkMsg").textContent = ""; };
@@ -326,180 +471,209 @@ input[type=text],input[type=password],input[type=number]{border:1px solid var(--
     $("#restore").onclick = () => {
       let o; try { o = JSON.parse(decodeURIComponent(escape(atob($("#backup").value.trim())))); } catch (e) { o = null; }
       if (!o || o.v !== 1 || !o.skills) { $("#bkMsg").textContent = "That code doesn't look right. Check you copied all of it."; return; }
-      modal(`<h3>Replace progress?</h3><p>This replaces everything on this device with the backup.</p><div class="row"><button class="btn primary" id="yes">Restore</button><button class="btn" data-close>Cancel</button></div>`, mm => mm.querySelector("#yes").onclick = () => { S = o; save(); mm.remove(); renderParents(); toast("Backup restored"); });
+      modal(`<h3>Replace progress?</h3><p>This replaces everything on this device with the backup.</p><div class="row"><button class="btn blue" id="yes">Restore</button><button class="btn" data-close>Cancel</button></div>`, mm => mm.querySelector("#yes").onclick = () => { S = o; save(); mm.remove(); renderParents(); toast("Backup restored"); });
     };
-    $("#resetAll").onclick = () => modal(`<h3>Reset all progress?</h3><p>Points, badges, streaks and levels go back to the start. This can't be undone unless you have a backup code.</p><div class="row"><button class="btn" style="background:var(--bad);color:#fff" id="yes">Reset</button><button class="btn" data-close>Cancel</button></div>`, mm => mm.querySelector("#yes").onclick = () => { const keep = { name: S.name, pin: S.pin, dailyCount: S.dailyCount }; S = Object.assign(M.newState(keep.name), keep); save(); mm.remove(); renderParents(); toast("Progress reset"); });
+    $("#resetAll").onclick = () => modal(`<h3>Reset all progress?</h3><p>Points, badges, streaks and levels go back to the start. This can't be undone unless you have a backup code.</p><div class="row"><button class="btn" style="background:var(--red);color:#fff" id="yes">Reset</button><button class="btn" data-close>Cancel</button></div>`, mm => mm.querySelector("#yes").onclick = () => { const keep = { name: S.name, pin: S.pin, dailyCount: S.dailyCount, sound: S.sound, voice: S.voice }; S = Object.assign(M.newState(keep.name), keep); save(); mm.remove(); renderParents(); toast("Progress reset"); });
   }
 
   /* ---------- diagrams ---------- */
   function diagram(d) {
     if (!d) return "";
-    const T = (x, y, t, a = "middle", sz = 15) => `<text x="${x}" y="${y}" text-anchor="${a}" font-size="${sz}" font-weight="700" fill="var(--ink)" font-family="inherit">${esc(t)}</text>`;
-    const stroke = `stroke="var(--brand)" stroke-width="3" fill="var(--soft)"`;
+    const T = (x, y, t, a = "middle", sz = 16) => `<text x="${x}" y="${y}" text-anchor="${a}" font-size="${sz}" font-weight="700" fill="#24164f" font-family="Fredoka,ui-rounded,sans-serif">${esc(t)}</text>`;
+    const stroke = `stroke="#8b5cf6" stroke-width="4" fill="#f3efff"`;
     let svg = "";
     if (d.k === "rect") {
-      const maxW = 240, maxH = 140, sc = Math.min(maxW / d.w, maxH / d.h), w = d.w * sc, h = d.h * sc;
-      svg = `<svg viewBox="0 0 ${w + 90} ${h + 50}" width="${w + 90}"><rect x="20" y="10" width="${w}" height="${h}" ${stroke}/>${T(20 + w / 2, h + 36, d.wl)}${T(w + 28, 10 + h / 2 + 5, d.hl, "start")}</svg>`;
+      const sc = Math.min(240 / d.w, 140 / d.h), w = d.w * sc, h = d.h * sc;
+      svg = `<svg viewBox="0 0 ${w + 100} ${h + 50}" width="${w + 100}"><rect x="20" y="10" width="${w}" height="${h}" rx="4" ${stroke}/>${T(20 + w / 2, h + 38, d.wl)}${T(w + 30, 10 + h / 2 + 5, d.hl, "start")}</svg>`;
     } else if (d.k === "tri") {
       const sc = Math.min(240 / d.b, 140 / d.h), b = d.b * sc, h = d.h * sc, apx = 20 + b * 0.35;
-      svg = `<svg viewBox="0 0 ${b + 100} ${h + 50}" width="${b + 100}"><polygon points="20,${h + 10} ${20 + b},${h + 10} ${apx},10" ${stroke}/><line x1="${apx}" y1="10" x2="${apx}" y2="${h + 10}" stroke="var(--ink)" stroke-dasharray="5 4" stroke-width="2"/><rect x="${apx}" y="${h}" width="10" height="10" fill="none" stroke="var(--ink)"/>${T(20 + b / 2, h + 36, d.bl)}${T(apx + 8, 10 + h / 2, d.hl, "start")}</svg>`;
+      svg = `<svg viewBox="0 0 ${b + 110} ${h + 50}" width="${b + 110}"><polygon points="20,${h + 10} ${20 + b},${h + 10} ${apx},10" ${stroke}/><line x1="${apx}" y1="10" x2="${apx}" y2="${h + 10}" stroke="#ff4fa3" stroke-dasharray="6 5" stroke-width="3"/><rect x="${apx}" y="${h}" width="10" height="10" fill="none" stroke="#24164f"/>${T(20 + b / 2, h + 38, d.bl)}${T(apx + 10, 10 + h / 2, d.hl, "start")}</svg>`;
     } else if (d.k === "lshape") {
-      const sc = Math.min(240 / d.W, 150 / d.H), W = d.W * sc, H = d.H * sc, cw = d.cw * sc, ch = d.ch * sc, x0 = 50, y0 = 14;
-      svg = `<svg viewBox="0 0 ${W + 130} ${H + 52}" width="${W + 130}"><polygon points="${x0},${y0} ${x0 + W - cw},${y0} ${x0 + W - cw},${y0 + ch} ${x0 + W},${y0 + ch} ${x0 + W},${y0 + H} ${x0},${y0 + H}" ${stroke}/>${T(x0 + W / 2, y0 + H + 26, d.W + " cm")}${T(x0 - 8, y0 + H / 2, d.H + " cm", "end")}${T(x0 + W - cw / 2, y0 + ch + 20, d.cw + " cm", "middle", 13)}${T(x0 + W - cw - 6, y0 + ch / 2 + 5, d.ch + " cm", "end", 13)}<rect x="${x0 + W - cw}" y="${y0}" width="${cw}" height="${ch}" fill="none" stroke="var(--muted)" stroke-dasharray="4 4"/></svg>`;
+      const sc = Math.min(240 / d.W, 150 / d.H), W = d.W * sc, H = d.H * sc, cw = d.cw * sc, ch = d.ch * sc, x0 = 64, y0 = 14;
+      svg = `<svg viewBox="0 0 ${W + 140} ${H + 56}" width="${W + 140}"><polygon points="${x0},${y0} ${x0 + W - cw},${y0} ${x0 + W - cw},${y0 + ch} ${x0 + W},${y0 + ch} ${x0 + W},${y0 + H} ${x0},${y0 + H}" ${stroke}/><rect x="${x0 + W - cw}" y="${y0}" width="${cw}" height="${ch}" fill="none" stroke="#b3a9d6" stroke-dasharray="5 5" stroke-width="2"/>${T(x0 + W / 2, y0 + H + 28, d.W + " cm")}${T(x0 - 8, y0 + H / 2 + 5, d.H + " cm", "end")}${T(x0 + W - cw / 2, y0 + ch + 22, d.cw + " cm", "middle", 14)}${T(x0 + W - cw - 6, y0 + ch / 2 + 5, d.ch + " cm", "end", 14)}</svg>`;
     } else if (d.k === "line") {
-      const a = d.a * Math.PI / 180, cx = 150, cy = 120, L = 110, ex = cx + L * Math.cos(a), ey = cy - L * Math.sin(a);
-      const mid1 = a / 2, mid2 = (a + Math.PI) / 2;
-      svg = `<svg viewBox="0 0 300 150" width="300"><line x1="30" y1="${cy}" x2="270" y2="${cy}" stroke="var(--brand)" stroke-width="4"/><line x1="${cx}" y1="${cy}" x2="${ex}" y2="${ey}" stroke="var(--brand)" stroke-width="4"/>${T(cx + 50 * Math.cos(mid1), cy - 50 * Math.sin(mid1) + 5, d.a + "°")}${T(cx + 50 * Math.cos(mid2), cy - 50 * Math.sin(mid2) + 5, d.x)}</svg>`;
+      const a = d.a * Math.PI / 180, cx = 160, cy = 125, L = 115, ex = cx + L * Math.cos(a), ey = cy - L * Math.sin(a), m1 = a / 2, m2 = (a + Math.PI) / 2;
+      svg = `<svg viewBox="0 0 320 155" width="320"><line x1="30" y1="${cy}" x2="290" y2="${cy}" stroke="#8b5cf6" stroke-width="5" stroke-linecap="round"/><line x1="${cx}" y1="${cy}" x2="${ex}" y2="${ey}" stroke="#8b5cf6" stroke-width="5" stroke-linecap="round"/>${T(cx + 52 * Math.cos(m1), cy - 52 * Math.sin(m1) + 6, d.a + "°")}${T(cx + 52 * Math.cos(m2), cy - 52 * Math.sin(m2) + 6, d.x)}</svg>`;
     } else if (d.k === "point") {
-      const cx = 140, cy = 110, L = 95, angs = [0, d.a, d.a + d.b].map(x => x * Math.PI / 180);
-      const lab = [[d.a, d.a + "°"], [d.b, d.b + "°"], [360 - d.a - d.b, d.x]];
-      let acc = 0;
-      svg = `<svg viewBox="0 0 280 220" width="280">${angs.map(t => `<line x1="${cx}" y1="${cy}" x2="${cx + L * Math.cos(t)}" y2="${cy - L * Math.sin(t)}" stroke="var(--brand)" stroke-width="4"/>`).join("")}<circle cx="${cx}" cy="${cy}" r="4" fill="var(--ink)"/>${lab.map(([deg, t]) => { const m = (acc + deg / 2) * Math.PI / 180; acc += deg; return T(cx + 52 * Math.cos(m), cy - 52 * Math.sin(m) + 5, t); }).join("")}</svg>`;
+      const cx = 150, cy = 115, L = 100, angs = [0, d.a, d.a + d.b].map(x => x * Math.PI / 180);
+      const lab = [[d.a, d.a + "°"], [d.b, d.b + "°"], [360 - d.a - d.b, d.x]]; let acc = 0;
+      svg = `<svg viewBox="0 0 300 230" width="300">${angs.map(t => `<line x1="${cx}" y1="${cy}" x2="${cx + L * Math.cos(t)}" y2="${cy - L * Math.sin(t)}" stroke="#8b5cf6" stroke-width="5" stroke-linecap="round"/>`).join("")}<circle cx="${cx}" cy="${cy}" r="5" fill="#24164f"/>${lab.map(([deg, t]) => { const m = (acc + deg / 2) * Math.PI / 180; acc += deg; return T(cx + 54 * Math.cos(m), cy - 54 * Math.sin(m) + 6, t); }).join("")}</svg>`;
     } else if (d.k === "triangle") {
-      const P = [[30, 170], [270, 170], [120, 20]];
+      const P = [[30, 175], [280, 175], [125, 20]];
       const labs = d.top != null ? [d.a, d.b, d.top + "°"] : [d.a + "°", d.b + "°", d.x];
-      const fmtL = v => (typeof v === "number" ? v + "°" : v);
-      svg = `<svg viewBox="0 0 300 200" width="300"><polygon points="${P.map(p => p.join(",")).join(" ")}" ${stroke}/>${T(62, 160, fmtL(labs[0]))}${T(232, 160, fmtL(labs[1]))}${T(124, 58, fmtL(labs[2]))}</svg>`;
+      const f = v => (typeof v === "number" ? v + "°" : v);
+      svg = `<svg viewBox="0 0 310 205" width="310"><polygon points="${P.map(p => p.join(",")).join(" ")}" ${stroke} stroke-linejoin="round"/>${T(66, 164, f(labs[0]))}${T(240, 164, f(labs[1]))}${T(128, 62, f(labs[2]))}</svg>`;
     } else if (d.k === "prism") {
-      const sc = Math.min(22, 170 / (d.l + d.w * 0.5), 120 / (d.h + d.w * 0.5)), l = d.l * sc, w = d.w * sc * 0.5, h = d.h * sc, x0 = 30, y0 = 20 + w;
+      const sc = Math.min(24, 170 / (d.l + d.w * 0.5), 130 / (d.h + d.w * 0.5)), l = d.l * sc, w = d.w * sc * 0.5, h = d.h * sc, x0 = 80, y0 = 18 + w;
       const front = `${x0},${y0} ${x0 + l},${y0} ${x0 + l},${y0 + h} ${x0},${y0 + h}`, top = `${x0},${y0} ${x0 + w},${y0 - w} ${x0 + l + w},${y0 - w} ${x0 + l},${y0}`, side = `${x0 + l},${y0} ${x0 + l + w},${y0 - w} ${x0 + l + w},${y0 + h - w} ${x0 + l},${y0 + h}`;
       let grid = "";
       if (d.cubes) {
-        for (let i = 1; i < d.l; i++) grid += `<line x1="${x0 + i * sc}" y1="${y0}" x2="${x0 + i * sc}" y2="${y0 + h}" stroke="var(--brand)" opacity=".5"/><line x1="${x0 + i * sc}" y1="${y0}" x2="${x0 + i * sc + w}" y2="${y0 - w}" stroke="var(--brand)" opacity=".5"/>`;
-        for (let j = 1; j < d.h; j++) grid += `<line x1="${x0}" y1="${y0 + j * sc}" x2="${x0 + l}" y2="${y0 + j * sc}" stroke="var(--brand)" opacity=".5"/><line x1="${x0 + l}" y1="${y0 + j * sc}" x2="${x0 + l + w}" y2="${y0 + j * sc - w}" stroke="var(--brand)" opacity=".5"/>`;
-        for (let k = 1; k < d.w; k++) { const f = k / d.w; grid += `<line x1="${x0 + f * w}" y1="${y0 - f * w}" x2="${x0 + l + f * w}" y2="${y0 - f * w}" stroke="var(--brand)" opacity=".5"/><line x1="${x0 + l + f * w}" y1="${y0 - f * w}" x2="${x0 + l + f * w}" y2="${y0 + h - f * w}" stroke="var(--brand)" opacity=".5"/>`; }
+        const ln = (x1, y1, x2, y2) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#8b5cf6" opacity=".6"/>`;
+        for (let i = 1; i < d.l; i++) grid += ln(x0 + i * sc, y0, x0 + i * sc, y0 + h) + ln(x0 + i * sc, y0, x0 + i * sc + w, y0 - w);
+        for (let j = 1; j < d.h; j++) grid += ln(x0, y0 + j * sc, x0 + l, y0 + j * sc) + ln(x0 + l, y0 + j * sc, x0 + l + w, y0 + j * sc - w);
+        for (let k = 1; k < d.w; k++) { const f = k / d.w; grid += ln(x0 + f * w, y0 - f * w, x0 + l + f * w, y0 - f * w) + ln(x0 + l + f * w, y0 - f * w, x0 + l + f * w, y0 + h - f * w); }
       }
-      const W2 = l + w + 120, H2 = h + w + 60;
-      svg = `<svg viewBox="0 0 ${W2} ${H2}" width="${W2}"><polygon points="${top}" fill="var(--brand-2)" opacity=".35" stroke="var(--brand)" stroke-width="2"/><polygon points="${side}" fill="var(--brand)" opacity=".25" stroke="var(--brand)" stroke-width="2"/><polygon points="${front}" fill="var(--soft)" stroke="var(--brand)" stroke-width="3"/>${grid}${d.ll ? T(x0 + l / 2, y0 + h + 24, d.ll) + T(x0 + l + w / 2 + 14, y0 + h - w / 2 + 16, d.wl, "start", 13) + T(x0 - 6, y0 + h / 2 + 5, d.hl, "end") : ""}</svg>`;
+      const W2 = x0 + l + w + 90, H2 = y0 + h + 40;
+      svg = `<svg viewBox="0 0 ${W2} ${H2}" width="${W2}"><polygon points="${top}" fill="#c9b6ff" stroke="#8b5cf6" stroke-width="3" stroke-linejoin="round"/><polygon points="${side}" fill="#a98bff" stroke="#8b5cf6" stroke-width="3" stroke-linejoin="round"/><polygon points="${front}" fill="#f3efff" stroke="#8b5cf6" stroke-width="4" stroke-linejoin="round"/>${grid}${d.ll ? T(x0 + l / 2, y0 + h + 28, d.ll) + T(x0 + l + w / 2 + 14, y0 + h - w / 2 + 18, d.wl, "start", 14) + T(x0 - 10, y0 + h / 2 + 6, d.hl, "end") : ""}</svg>`;
     } else if (d.k === "bag") {
-      const cols = { red: "#e0533f", blue: "#3657e8", green: "#12925f" }; const list = []; Object.entries(d.counts).forEach(([c, n]) => { for (let i = 0; i < n; i++) list.push(cols[c]); });
+      const cols = { red: "#ff5a5f", blue: "#2f6bff", green: "#1fc46b" }; const list = []; Object.entries(d.counts).forEach(([c, n]) => { for (let i = 0; i < n; i++) list.push(cols[c]); });
       const per = 8, rows = Math.ceil(list.length / per);
-      svg = `<svg viewBox="0 0 ${per * 30 + 20} ${rows * 30 + 20}" width="${per * 30 + 20}">${list.map((c, i) => `<circle cx="${25 + (i % per) * 30}" cy="${25 + Math.floor(i / per) * 30}" r="12" fill="${c}"/>`).join("")}</svg>`;
+      svg = `<svg viewBox="0 0 ${per * 32 + 20} ${rows * 32 + 20}" width="${per * 32 + 20}">${list.map((c, i) => `<circle cx="${26 + (i % per) * 32}" cy="${26 + Math.floor(i / per) * 32}" r="13" fill="${c}" stroke="#24164f" stroke-width="2"/><circle cx="${22 + (i % per) * 32}" cy="${21 + Math.floor(i / per) * 32}" r="4" fill="#fff" opacity=".6"/>`).join("")}</svg>`;
     }
     return `<div class="diagram">${svg}</div>`;
   }
 
   /* ---------- QUESTION FLOW ---------- */
-  let run = null, tick = null;
+  let run = null, tick = null, cur = null;
   function startDaily() { const d = todayRec(true); if (d.done) return; run = { mode: "daily", qs: d.qs, i: d.i, day: d, results: d.results || [], pts: d.points, levelEvents: [], newBadges: [] }; openQ(); }
   function startPractice(skill) {
     const qs = [];
     for (let i = 0; i < 5; i++) { const id = skill || M.SKILLS[Math.floor(Math.random() * M.SKILLS.length)].id; qs.push(M.generate(id, S.skills[id].level)); }
     run = { mode: "practice", skill, qs, i: 0, results: [], pts: 0, levelEvents: [], newBadges: [], timeSec: 0, correct: 0 }; openQ();
   }
-  function openQ() { $("#qscreen").hidden = false; document.body.style.overflow = "hidden"; newQuestion(); }
-  function closeQ() { clearInterval(tick); $("#qscreen").hidden = true; document.body.style.overflow = ""; run = null; save(); render(); }
+  function openQ() { audio(); $("#qscreen").hidden = false; document.body.style.overflow = "hidden"; newQuestion(); }
+  function closeQ() { clearInterval(tick); hush(); $("#qscreen").hidden = true; document.body.style.overflow = ""; run = null; cur = null; save(); render(); }
 
-  let cur = null;
   function newQuestion() {
     const q = run.qs[run.i];
-    cur = { q, input: "", choice: null, help: 0, hintsShown: 0, tries: 1, t0: Date.now(), state: "ask", shown: false };
+    cur = { q, input: "", choice: null, help: 0, hintsShown: 0, tries: 1, t0: Date.now(), lastAct: Date.now(), nudges: 0, nudge: false, state: "ask", shown: false, mood: "happy" };
     drawQ();
-    clearInterval(tick); tick = setInterval(updTimer, 1000);
+    clearInterval(tick); tick = setInterval(onTick, 1000);
+    if (S.voice) setTimeout(() => cur && cur.q === q && readQuestion(q), 350);
   }
   const secs = () => (Date.now() - cur.t0) / 1000;
-  function updTimer() { const el = $("#timer"); if (!el || !cur) return; const s = secs(); el.textContent = fmtSec(s); el.classList.toggle("over", s > cur.q.target); }
+  function onTick() {
+    if (!cur) return;
+    const el = $("#timer"); if (el) { const s = secs(); el.textContent = fmtSec(s); el.classList.toggle("over", s > cur.q.target); }
+    // gentle nudge when he's been sitting on it
+    if ((cur.state === "ask" || cur.state === "retry") && !cur.nudge && !cur.shown) {
+      const idle = (Date.now() - cur.lastAct) / 1000;
+      const wait = cur.nudges === 0 ? Math.max(25, cur.q.target * 0.6) : 45;
+      if (idle > wait && cur.nudges < 2) { cur.nudge = true; cur.nudges++; cur.mood = "think"; drawQ(); sfx("hint"); say(cur.hintsShown < cur.q.hints.length ? rnd(["Do you need a hint?", "Stuck? Want a hint?", "Take your time. Would a hint help?"]) : "Want me to show you how?"); }
+    }
+  }
+  const touch = () => { if (cur) cur.lastAct = Date.now(); };
   function drawQ() {
     const q = cur.q, sk = M.SKILL[q.skill], n = run.qs.length;
     const prog = run.qs.map((_, i) => `<i class="${i < run.results.length ? (run.results[i] ? "ok" : "no") : i === run.i ? "cur" : ""}"></i>`).join("");
     const isChoice = q.answer.t === "choice";
     const ph = q.answer.t === "frac" ? "type like 3/4" : q.answer.t === "time" ? "type like 14:30" : "type your answer";
-    const answered = cur.state !== "ask" && cur.state !== "retry";
+    const answered = cur.state === "right" || cur.state === "wrong";
+    const moreHints = cur.hintsShown < q.hints.length;
     $("#qscreen").innerHTML = `<div class="qwrap">
-      <div class="qtop"><button class="x" id="qclose" aria-label="Save and exit">×</button><div class="prog">${prog}</div><span class="timer" id="timer">${fmtSec(secs())}</span></div>
-      <div class="row between"><span class="chip">${sk.name}</span><span class="row" style="gap:8px">${yearChip(q.level)}<span class="chip">⭐ ${run.pts}</span><span class="muted">${run.i + 1} of ${n}</span></span></div>
+      <div class="qtop"><button class="round" id="qclose" aria-label="Save and exit">✕</button><div class="prog">${prog}</div><span class="timer" id="timer">${fmtSec(secs())}</span>
+        <button class="round" id="mute" aria-label="${S.voice ? "Turn voice off" : "Turn voice on"}">${S.voice ? '<svg viewBox="0 0 24 24" fill="none" stroke="#24164f" stroke-width="2.4" stroke-linecap="round"><path d="M4 10v4h4l5 4V6L8 10z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg>' : '<svg viewBox="0 0 24 24" fill="none" stroke="#24164f" stroke-width="2.4" stroke-linecap="round"><path d="M4 10v4h4l5 4V6L8 10z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>'}</button></div>
+      <div class="row between"><span class="chip" style="background:${STRAND_COL[sk.strand]};color:#fff">${sk.name}</span><span class="row" style="gap:8px">${yearChip(q.level)}<span class="chip">⭐ ${run.pts}</span><span class="chip">${run.i + 1} of ${n}</span></span></div>
       <div class="qbody">
-        <section class="card">
-          <div class="prompt">${md(q.prompt)}</div>
+        <section class="card qcard" id="qcard">
+          ${cur.nudge ? `<div class="nudge" role="dialog"><b>${moreHints ? "Stuck? Want a hint?" : "Want me to show you how?"}</b><div class="row"><button class="btn yellow" id="nudgeYes">${moreHints ? "Yes, hint please" : "Show me"}</button><button class="btn" id="nudgeNo">I've got it</button></div></div>` : ""}
+          <div class="qhead">${mascot(cur.mood)}<div class="prompt">${md(q.prompt)}</div></div>
+          <div><button class="speak" id="readQ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 10v4h4l5 4V6L8 10z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg>Read it to me</button></div>
           ${diagram(q.diagram)}
-          <div class="hints" id="hints">${q.hints.slice(0, cur.hintsShown).map((h, i) => `<div class="hint"><b>Hint ${i + 1}:</b> ${md(h)}</div>`).join("")}</div>
+          <div class="hints">${q.hints.slice(0, cur.hintsShown).map((h, i) => `<div class="hint"><b>💡 Hint ${i + 1}:</b> ${md(h)}</div>`).join("")}</div>
           ${cur.shown || answered ? `<div class="steps"><b>How to solve it</b><ol>${q.steps.map(s => `<li>${md(s)}</li>`).join("")}</ol></div>` : ""}
           ${feedbackHtml()}
         </section>
-        <section style="display:grid;gap:10px;align-content:start">
-          ${isChoice ? `<div class="choices">${q.answer.o.map((o, i) => `<button data-choice="${i}" class="${cur.choice === i ? "sel" : ""}" ${answered ? "disabled" : ""}>${esc(o)}</button>`).join("")}</div>` :
-            `<div class="answer ${answered ? "" : "focus"}" id="ansbox"><span class="val">${cur.input ? esc(cur.input) : `<span class="ph">${ph}</span>`}</span>${q.unit ? `<span class="unit">${esc(q.unit)}</span>` : ""}</div>`}
-          ${answered ? `<button class="btn primary big" id="next">${run.i + 1 >= n ? "See results" : "Next question"}</button>` : `
-            ${isChoice ? `<button class="btn primary big" id="checkBtn" ${cur.choice == null ? "disabled" : ""}>Check</button>` : `<div class="keypad">${["7", "8", "9", "⌫", "4", "5", "6", "/", "1", "2", "3", ":", "0", "."].map(k => `<button data-k="${k}" aria-label="${k === "⌫" ? "Delete" : k}">${k}</button>`).join("")}<button class="check" id="checkBtn">Check</button></div>`}
+        <section style="display:grid;gap:12px;align-content:start">
+          ${isChoice ? `<div class="choices">${q.answer.o.map((o, i) => `<button data-choice="${i}" class="${cur.choice === i ? "sel" : ""}" style="background:${COLORS[i % COLORS.length]}" ${answered ? "disabled" : ""}>${esc(o)}</button>`).join("")}</div>` :
+            `<div class="answer ${answered ? "" : "focus"}" id="ansbox"><span class="val">${cur.input ? prettyInput(cur.input) : `<span class="ph">${ph}</span>`}</span>${q.unit ? `<span class="unit">${esc(q.unit)}</span>` : ""}</div>`}
+          ${answered ? `<button class="btn ${cur.state === "right" ? "green" : "blue"} big" id="next">${run.i + 1 >= n ? "See my results 🏆" : "Next question ➜"}</button>` : `
+            ${isChoice ? `<button class="btn green big" id="checkBtn" ${cur.choice == null ? "disabled" : ""}>Check ✓</button>` : `<div class="keypad">${["7", "8", "9", "⌫", "4", "5", "6", "/", "1", "2", "3", ":", "0", "."].map(k => `<button data-k="${k}" class="${k === "⌫" ? "del" : /[/:.]/.test(k) ? "sym" : ""}" aria-label="${k === "⌫" ? "Delete" : k}">${k}</button>`).join("")}<button class="check" id="checkBtn">Check ✓</button></div>`}
             <div class="helpbar">
-              <button class="btn" id="hintBtn" ${cur.hintsShown >= q.hints.length ? "disabled" : ""}>Hint ${cur.hintsShown < q.hints.length ? `(${cur.hintsShown + 1} of ${q.hints.length})` : ""}</button>
-              <button class="btn" id="methodBtn">How does this work?</button>
-              <button class="btn" id="showBtn" ${cur.shown ? "disabled" : ""}>Show me</button>
+              <button class="btn yellow" id="hintBtn" ${moreHints ? "" : "disabled"}>💡 Hint${moreHints ? ` ${cur.hintsShown + 1}/${q.hints.length}` : ""}</button>
+              <button class="btn purple" id="methodBtn">📘 How does it work?</button>
+              <button class="btn orange" id="showBtn" ${cur.shown ? "disabled" : ""}>👀 Show me</button>
             </div>`}
         </section>
       </div></div>`;
-    $("#qclose").onclick = () => { if (run.mode === "daily") { save(); } closeQ(); };
+    $("#qclose").onclick = closeQ;
+    $("#mute").onclick = () => { S.voice = !S.voice; save(); if (!S.voice) hush(); else readQuestion(q); drawQ(); };
+    $("#readQ").onclick = () => { touch(); readQuestion(q); };
     document.querySelectorAll("[data-k]").forEach(b => b.onclick = () => key(b.dataset.k));
-    document.querySelectorAll("[data-choice]").forEach(b => b.onclick = () => { cur.choice = +b.dataset.choice; drawQ(); });
+    document.querySelectorAll("[data-choice]").forEach(b => b.onclick = () => { touch(); sfx("tap"); cur.choice = +b.dataset.choice; if (cur.state === "retry") cur.state = "ask"; cur.nudge = false; drawQ(); });
     const cb = $("#checkBtn"); if (cb) cb.onclick = submit;
     const nb = $("#next"); if (nb) nb.onclick = advance;
-    const hb = $("#hintBtn"); if (hb) hb.onclick = () => { cur.hintsShown++; cur.help = Math.max(cur.help, Math.min(2, cur.hintsShown)); drawQ(); };
-    const mb = $("#methodBtn"); if (mb) mb.onclick = () => { cur.help = Math.max(cur.help, 1); modal(`<h2>${sk.name}</h2><ul class="lesson">${M.LESSONS[q.skill].map(x => `<li>${md(x)}</li>`).join("")}</ul><button class="btn primary" data-close>Back to the question</button>`); };
-    const sb = $("#showBtn"); if (sb) sb.onclick = () => { cur.shown = true; cur.help = 3; drawQ(); };
-    updTimer();
+    const hb = $("#hintBtn"); if (hb) hb.onclick = showHint;
+    const mb = $("#methodBtn"); if (mb) mb.onclick = () => { touch(); cur.help = Math.max(cur.help, 1); cur.nudge = false; say(M.LESSONS[q.skill].join(" ")); modal(`<div class="row" style="flex-wrap:nowrap;align-items:flex-start">${mascot("happy")}<div><h2>${sk.name}</h2><ul class="lesson">${M.LESSONS[q.skill].map(x => `<li>${md(x)}</li>`).join("")}</ul></div></div><button class="btn blue big" data-close>Back to the question</button>`, mm => mm.querySelectorAll(".mascot").forEach(s => { s.style.width = "70px"; s.style.height = "70px"; s.style.flex = "none"; })); };
+    const sb = $("#showBtn"); if (sb) sb.onclick = showMe;
+    const ny = $("#nudgeYes"); if (ny) ny.onclick = () => { cur.nudge = false; moreHints ? showHint() : showMe(); };
+    const nn = $("#nudgeNo"); if (nn) nn.onclick = () => { cur.nudge = false; touch(); cur.mood = "happy"; hush(); say("You've got this!"); drawQ(); };
   }
+  function showHint() { touch(); cur.nudge = false; cur.hintsShown++; cur.help = Math.max(cur.help, Math.min(2, cur.hintsShown)); cur.mood = "happy"; sfx("hint"); drawQ(); say("Hint: " + cur.q.hints[cur.hintsShown - 1]); }
+  function showMe() { touch(); cur.nudge = false; cur.shown = true; cur.help = 3; drawQ(); say("Here's how. " + cur.q.steps.join(". ") + ". Now you type the answer."); }
   function feedbackHtml() {
-    if (cur.state === "retry") return `<div class="fb try"><h3>Not quite. Have another go!</h3><span>Check your working, or tap Hint if you're stuck.</span></div>`;
-    if (cur.state === "right") return `<div class="fb good"><h3>${pickPraise()} +${cur.pts} points</h3>${cur.fast && cur.help === 0 ? `<span>Speed bonus: under ${fmtSec(cur.q.target)}!</span>` : ""}</div>`;
-    if (cur.state === "wrong") return `<div class="fb bad"><h3>The answer is ${esc(M.answerText(cur.q.answer))}${cur.q.unit ? " " + esc(cur.q.unit) : ""}</h3><span>Read through the steps above. You'll see this kind again soon.</span></div>`;
+    if (cur.state === "retry") return `<div class="fb try"><h3>Not quite. Try again! 💪</h3><span>Check your working, or tap 💡 Hint if you're stuck.</span></div>`;
+    if (cur.state === "right") return `<div class="fb good"><h3>${cur.praise} +${cur.pts} points</h3>${cur.fast && cur.help === 0 ? `<span>⚡ Speed bonus: under ${fmtSec(cur.q.target)}!</span>` : ""}</div>`;
+    if (cur.state === "wrong") return `<div class="fb bad"><h3>The answer is ${esc(M.answerText(cur.q.answer))}${cur.q.unit ? " " + esc(cur.q.unit) : ""}</h3><span>Good try! Read the steps above. You'll get it next time.</span></div>`;
     return "";
   }
-  const PRAISE = ["Nailed it!", "Correct!", "Awesome!", "Brilliant!", "Spot on!", "Too easy!", "Legend!"];
-  let praise = PRAISE[0]; const pickPraise = () => praise;
+  const PRAISE = ["Well done!", "Brilliant!", "Awesome!", "Nailed it!", "Spot on!", "Superstar!", "Legend!", "Too easy!", "Amazing!"];
   function key(k) {
-    if (cur.state !== "ask" && cur.state !== "retry") return;
+    if (!cur || (cur.state !== "ask" && cur.state !== "retry")) return;
+    touch(); sfx("tap");
     if (k === "⌫") cur.input = cur.input.slice(0, -1); else if (cur.input.length < 14) cur.input += k;
     if (cur.state === "retry") cur.state = "ask";
-    const v = $("#ansbox .val"); if (v) v.innerHTML = cur.input ? esc(cur.input) : `<span class="ph">type your answer</span>`;
+    if (cur.nudge) { cur.nudge = false; cur.mood = "happy"; drawQ(); return; }
+    const v = $("#ansbox .val"); if (v) v.innerHTML = cur.input ? prettyInput(cur.input) : `<span class="ph">type your answer</span>`;
   }
   function submit() {
     const q = cur.q, val = q.answer.t === "choice" ? cur.choice : cur.input;
     if (val === "" || val == null) return;
+    touch();
     const ok = M.check(q.answer, val);
     if (!ok && cur.tries === 1 && !cur.shown) {
-      cur.tries = 2; cur.state = "retry"; cur.input = q.answer.t === "choice" ? cur.input : ""; drawQ();
-      const box = $("#ansbox"); if (box) { box.classList.remove("shake"); void box.offsetWidth; box.classList.add("shake"); }
+      cur.tries = 2; cur.state = "retry"; cur.mood = "think"; cur.nudge = false;
+      if (q.answer.t !== "choice") cur.input = "";
+      sfx("wrong"); say(rnd(["Try again!", "Not quite. Try again!", "Ooh, close. Have another go!"]));
+      drawQ();
+      const box = $("#ansbox") || $(".choices"); if (box) { box.classList.remove("shake"); void box.offsetWidth; box.classList.add("shake"); }
       return;
     }
     const s = secs();
     clearInterval(tick);
     const res = M.record(S, q, ok, cur.help, cur.tries, s);
-    cur.pts = res.pts; cur.fast = res.fast; cur.state = ok ? "right" : "wrong";
-    praise = PRAISE[Math.floor(Math.random() * PRAISE.length)];
+    cur.pts = res.pts; cur.fast = res.fast; cur.state = ok ? "right" : "wrong"; cur.nudge = false;
+    cur.praise = rnd(PRAISE); cur.mood = ok ? "wow" : "sad";
     run.results.push(ok ? 1 : 0); run.pts += res.pts;
-    res.events.forEach(e => { if (e.type === "levelup") { run.levelEvents.push(e); toast(`Level up! ${M.SKILL[e.skill].name} is now ${M.YEAR[e.level]}`); } });
-    const nb = M.checkBadges(S); nb.forEach(b => { run.newBadges.push(b); toast(`New badge: ${b.name}`); });
+    if (ok) { sfx("right"); bigTick(); confetti(); say(cur.praise + (cur.fast && cur.help === 0 ? " And super fast!" : "")); }
+    else { sfx("wrong"); say(`Good try. The answer is ${M.answerText(q.answer)}${q.unit ? " " + q.unit : ""}. Let's look at how.`); }
+    res.events.forEach(e => { if (e.type === "levelup") { run.levelEvents.push(e); setTimeout(() => { sfx("level"); toast(`⬆ Level up! ${M.SKILL[e.skill].name} is now ${M.YEAR[e.level]}`); }, 900); } });
+    M.checkBadges(S).forEach(b => { run.newBadges.push(b); setTimeout(() => toast(`🏅 New badge: ${b.name}`), 1500); });
     if (run.mode === "daily") { const d = run.day; d.results = run.results; d.correct += ok ? 1 : 0; d.points += res.pts; d.timeSec += Math.round(s); if (cur.help > 0) d.helpUsed++; d.i = run.i + 1; }
     else { run.correct += ok ? 1 : 0; run.timeSec += s; }
     save(); drawQ();
   }
   function advance() {
-    run.i++;
+    hush(); run.i++;
     if (run.i < run.qs.length) { newQuestion(); return; }
     clearInterval(tick);
-    if (run.mode === "daily") { const d = run.day; d.done = true; const nb = M.finishDay(S, d); run.newBadges.push(...nb); save(); results(d.correct, d.total, d.timeSec, d.points, d.stars); }
+    if (run.mode === "daily") { const d = run.day; d.done = true; run.newBadges.push(...M.finishDay(S, d)); save(); results(d.correct, d.total, d.timeSec, d.points, d.stars); }
     else results(run.correct, run.qs.length, run.timeSec, run.pts, null);
   }
   function results(correct, total, t, pts, stars) {
     const lv = run.levelEvents, bd = run.newBadges, daily = run.mode === "daily";
-    $("#qscreen").innerHTML = `<div class="qwrap" style="max-width:640px">
+    const great = correct / total >= 0.7;
+    $("#qscreen").innerHTML = `<div class="qwrap" style="max-width:660px">
       <section class="card" style="text-align:center;justify-items:center">
+        ${mascot(great ? "wow" : "happy", "bob")}
         <h1>${daily ? "Mission complete!" : "Practice done!"}</h1>
-        ${stars ? `<div class="stars" style="transform:scale(1.6);margin:10px 0">${[1, 2, 3].map(i => starSvg(i <= stars)).join("")}</div>` : ""}
+        ${stars ? `<div class="stars" style="transform:scale(1.7);margin:12px 0">${[1, 2, 3].map(i => starSvg(i <= stars)).join("")}</div>` : ""}
         <div class="row" style="justify-content:center;gap:28px">
-          <div><div class="big-num">${correct}/${total}</div><span class="muted">right</span></div>
-          <div><div class="big-num">${fmtSec(t)}</div><span class="muted">time</span></div>
-          <div><div class="big-num">+${pts}</div><span class="muted">points</span></div>
+          <div><div class="big-num" style="color:var(--green)">${correct}/${total}</div><span class="muted">right</span></div>
+          <div><div class="big-num" style="color:var(--blue)">${fmtSec(t)}</div><span class="muted">time</span></div>
+          <div><div class="big-num" style="color:var(--orange)">+${pts}</div><span class="muted">points</span></div>
         </div>
-        ${daily ? `<p style="margin:0">🔥 ${S.streak.count} day streak${S.bestTime && Math.round(t) <= S.bestTime && correct / total >= 0.8 ? " · New best time!" : ""}</p>` : ""}
-        ${lv.length ? `<div style="display:grid;gap:6px">${lv.map(e => `<span class="chip y${e.level}">Level up: ${M.SKILL[e.skill].name} → ${M.YEAR[e.level]}</span>`).join("")}</div>` : ""}
+        ${daily ? `<p style="margin:0;font-size:1.2rem">🔥 ${S.streak.count} day streak!</p>` : ""}
+        ${lv.length ? `<div style="display:grid;gap:6px">${lv.map(e => `<span class="chip y${e.level}">⬆ ${M.SKILL[e.skill].name} → ${M.YEAR[e.level]}</span>`).join("")}</div>` : ""}
         ${bd.length ? `<div class="badges" style="width:100%">${bd.map(b => `<div class="badge">${badgeSvg(M.BADGES.indexOf(b))}<b>${b.name}</b><small>${b.desc}</small></div>`).join("")}</div>` : ""}
-        <div class="row" style="justify-content:center"><button class="btn primary big" id="home">Back home</button>${!daily ? `<button class="btn big" id="again">Go again</button>` : ""}</div>
+        <div class="row" style="justify-content:center"><button class="btn blue big" id="home">Back home</button>${!daily ? `<button class="btn pink big" id="again">Go again</button>` : ""}</div>
       </section></div>`;
+    document.querySelectorAll("#qscreen .mascot").forEach(s => { s.style.width = "120px"; s.style.height = "120px"; });
+    sfx("finish"); if (great) { confetti(220); setTimeout(() => confetti(160), 700); }
+    say(`${daily ? "Mission complete!" : "Practice done!"} You got ${correct} out of ${total}. ${great ? "Awesome work!" : "Good effort. Keep practising and you'll level up!"}`);
     $("#home").onclick = closeQ;
-    const ag = $("#again"); if (ag) { const sk = run.skill; ag.onclick = () => { clearInterval(tick); startPractice(sk); }; }
+    const ag = $("#again"); if (ag) { const sk = run.skill; ag.onclick = () => { hush(); startPractice(sk); }; }
   }
-  // physical keyboard support (desktop testing / iPad keyboard)
   document.addEventListener("keydown", e => {
     if ($("#qscreen").hidden || !cur || document.querySelector(".modal")) return;
     if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return;
@@ -508,22 +682,21 @@ input[type=text],input[type=password],input[type=number]{border:1px solid var(--
     else if (e.key === "Enter") { e.preventDefault(); if (cur.state === "right" || cur.state === "wrong") advance(); else submit(); }
   });
 
-  /* ---------- tabs & routing ---------- */
+  /* ---------- tabs ---------- */
   function render() {
     document.querySelectorAll("#tabs [data-tab]").forEach(b => b.setAttribute("aria-current", b.dataset.tab === tab ? "page" : "false"));
     if (tab === "home") renderHome(); else if (tab === "learn") renderLearn(); else if (tab === "trophies") renderTrophies(); else renderParents();
     window.scrollTo(0, 0);
   }
-  document.querySelectorAll("#tabs [data-tab]").forEach(b => b.onclick = () => { tab = b.dataset.tab; if (tab !== "parents") parentsOpen = false; render(); });
+  document.querySelectorAll("#tabs [data-tab]").forEach(b => b.onclick = () => { audio(); sfx("tap"); tab = b.dataset.tab; if (tab !== "parents") parentsOpen = false; render(); });
   document.addEventListener("click", e => {
-    const p = e.target.closest("[data-practise]"); if (p) { startPractice(p.dataset.practise); return; }
+    const p = e.target.closest("[data-practise]"); if (p) { audio(); startPractice(p.dataset.practise); return; }
     const l = e.target.closest("[data-lesson]"); if (l) { openLesson(l.dataset.lesson); return; }
     const t = e.target.closest("[data-tab-go]"); if (t) { tab = t.dataset.tabGo; render(); }
   });
-  // first launch: say hello
-  if (!S.history.length && !S.seenIntro) {
-    S.seenIntro = true; save();
-    setTimeout(() => modal(`<h2>Welcome to the Maths Lab!</h2><p>Every day there's a <b>mission</b>: ${S.dailyCount} problems, including brain-bending puzzles.</p><ul class="lesson"><li>Stuck? Tap <b>Hint</b>. <b>How does this work?</b> explains the method. <b>Show me</b> walks you through it, but you get fewer points.</li><li>Get it right with no help, fast, for bonus points.</li><li>Get questions right and the app moves you up a level. Year 6+ is the top!</li><li>Keep a daily streak going to win badges.</li></ul><button class="btn primary big" data-close>Let's go</button>`), 300);
+  if (!S.history.length && !S.seenIntro2) {
+    S.seenIntro2 = true; save();
+    setTimeout(() => modal(`<div class="row" style="flex-wrap:nowrap;align-items:flex-start">${mascot("wow", "bob")}<div><h2>Hi! I'm Bolt.</h2><p style="margin:6px 0 0">Welcome to the Maths Lab!</p></div></div><ul class="lesson"><li>Every day there's a <b>mission</b>: ${S.dailyCount} problems, plus brain-bending puzzles.</li><li>I'll read each question out loud. Tap <b>Read it to me</b> to hear it again.</li><li>Stuck? Tap <b>💡 Hint</b>. <b>📘 How does it work?</b> explains the method. <b>👀 Show me</b> walks you through it, but you get fewer points.</li><li>Get it right with no help, fast, for bonus points ⚡</li><li>Get lots right and you level up. Year 6+ is the top!</li></ul><button class="btn green big" data-close id="letsgo">Let's go! 🚀</button>`, mm => { mm.querySelectorAll(".mascot").forEach(s => { s.style.width = "90px"; s.style.height = "90px"; s.style.flex = "none"; }); mm.querySelector("#letsgo").addEventListener("click", () => { audio(); sfx("finish"); say(`Let's go, ${S.name}!`); }); }), 300);
   }
   render();
   if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
