@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Coop's Maths Lab</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Maths Lab">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#3657e8">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<style>
+/* Layout: mission-control for one kid — Home (today's mission), Learn (skills), Trophies, Grown-ups; questions take over the full screen. */
+:root{
+  --bg:#eef3fb; --surface:#ffffff; --ink:#14213d; --muted:#5b6b85; --line:#d6e0ef; --soft:#e4ebfb;
+  --brand:#3657e8; --brand-2:#6f86ff; --on-brand:#ffffff;
+  --good:#12925f; --good-soft:#dcf5ea; --bad:#d6452f; --bad-soft:#fde4df; --gold:#e6a700; --gold-soft:#fff3cc;
+  --font:ui-rounded,"SF Pro Rounded","Nunito","Segoe UI Variable Display","Segoe UI",system-ui,sans-serif;
+  --r:18px; color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0f1626; --surface:#18223a; --ink:#e9eefb; --muted:#9aa8c4; --line:#2a3654; --soft:#1f2c4a;
+  --brand:#7d95ff; --brand-2:#a5b5ff; --on-brand:#0f1626;
+  --good:#3fd398; --good-soft:#123a2b; --bad:#ff7c69; --bad-soft:#3d1a16; --gold:#ffd34d; --gold-soft:#3a3010; color-scheme:dark}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:18px;line-height:1.4;-webkit-user-select:none;user-select:none;-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;touch-action:manipulation}
+input,textarea,select{font:inherit;color:inherit;-webkit-user-select:text;user-select:text}
+:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+[hidden]{display:none!important}
+.app{max-width:920px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) calc(100px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));display:grid;gap:16px}
+h1,h2,h3{margin:0;line-height:1.15;text-wrap:balance}
+h1{font-size:2rem;font-weight:800;letter-spacing:-.01em}
+h2{font-size:1.35rem;font-weight:800}
+h3{font-size:1.1rem;font-weight:800}
+.muted{color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:grid;gap:12px;min-width:0}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.between{justify-content:space-between}
+.btn{background:var(--soft);border-radius:14px;padding:12px 18px;font-weight:800;min-height:48px}
+.btn.primary{background:var(--brand);color:var(--on-brand)}
+.btn.good{background:var(--good);color:#fff}
+.btn.big{font-size:1.25rem;padding:16px 26px;min-height:60px;border-radius:18px}
+.btn:disabled{opacity:.45}
+.chip{white-space:nowrap;display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 12px;font-weight:800;font-size:.85rem;background:var(--soft)}
+.chip.y1{background:var(--gold-soft);color:var(--ink)} .chip.y2{background:var(--soft);color:var(--brand)} .chip.y3{background:var(--good-soft);color:var(--good)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+/* top / hero */
+.hello{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.stat{display:flex;gap:10px;flex-wrap:wrap}
+.stat .chip{font-size:1rem;padding:8px 14px;background:var(--surface);border:1px solid var(--line)}
+.mission{background:linear-gradient(135deg,var(--brand),var(--brand-2));color:var(--on-brand);border:0}
+.mission .muted{color:inherit;opacity:.85}
+.ring{width:96px;height:96px;flex:none}
+.ring circle{fill:none;stroke-width:10}
+.ring .bgc{stroke:rgba(255,255,255,.3)} .ring .fg{stroke:#fff;stroke-linecap:round;transition:stroke-dashoffset .5s}
+.ring text{fill:#fff;font-weight:800;font-size:20px;font-family:var(--font)}
+.mission .btn{background:#fff;color:#2340c9}
+.stars{display:flex;gap:4px}
+.star{width:28px;height:28px}
+.week{display:flex;gap:6px}
+.week span{width:34px;height:34px;border-radius:10px;background:var(--soft);display:grid;place-items:center;font-size:.75rem;font-weight:800;color:var(--muted)}
+.week span.on{background:var(--gold);color:#3a2a00}
+.week span.today{outline:2px solid var(--brand);outline-offset:1px}
+.bar{height:12px;border-radius:999px;background:var(--soft);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--brand);border-radius:999px}
+.skillrow{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.skillrow:first-child{border-top:0}
+.skillrow .grow{flex:1;min-width:0;display:grid;gap:6px}
+.skillrow b{font-size:1rem}
+/* tabs */
+.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:center;padding:6px max(8px,env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));z-index:5}
+.tabs button{flex:1;max-width:180px;display:grid;justify-items:center;gap:2px;padding:6px;border-radius:12px;font-size:.8rem;font-weight:800;color:var(--muted)}
+.tabs button svg{width:26px;height:26px}
+.tabs button[aria-current="page"]{color:var(--brand);background:var(--soft)}
+/* question screen */
+.qscreen{position:fixed;inset:0;background:var(--bg);z-index:10;overflow:auto;padding:calc(10px + env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+.qwrap{max-width:900px;margin:0 auto;display:grid;gap:12px}
+.qtop{display:flex;align-items:center;gap:12px}
+.x{width:44px;height:44px;border-radius:50%;background:var(--surface);border:1px solid var(--line);font-size:1.4rem;font-weight:800;flex:none}
+.prog{flex:1;display:flex;gap:4px}
+.prog i{flex:1;height:10px;border-radius:999px;background:var(--line)}
+.prog i.ok{background:var(--good)} .prog i.no{background:var(--bad)} .prog i.cur{background:var(--brand)}
+.timer{font-variant-numeric:tabular-nums;font-weight:800;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:6px 10px;min-width:72px;text-align:center}
+.timer.over{color:var(--bad)}
+.qbody{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:760px){.qbody{grid-template-columns:minmax(0,1fr)}}
+.prompt{font-size:1.5rem;font-weight:700;line-height:1.35}
+.prompt b{color:var(--brand)}
+.diagram{display:flex;justify-content:center}
+.diagram svg{max-width:100%;height:auto}
+.answer{display:flex;align-items:center;gap:10px;background:var(--bg);border:3px solid var(--line);border-radius:16px;padding:10px 16px;min-height:68px;font-size:2rem;font-weight:800;font-variant-numeric:tabular-nums}
+.answer.focus{border-color:var(--brand)}
+.answer .val{flex:1;min-width:0;overflow-wrap:anywhere}
+.answer .ph{color:var(--muted);font-size:1.1rem;font-weight:600}
+.answer .unit{color:var(--muted);font-size:1.2rem}
+.answer.shake{animation:shake .35s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@media (prefers-reduced-motion:reduce){.answer.shake{animation:none}}
+.keypad{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.keypad button{background:var(--surface);border:1px solid var(--line);border-radius:14px;min-height:62px;font-size:1.6rem;font-weight:800}
+.keypad button:active{transform:scale(.97)}
+.keypad .check{grid-column:span 2;background:var(--brand);color:var(--on-brand);border-color:var(--brand);font-size:1.3rem}
+.choices{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.choices button{background:var(--surface);border:2px solid var(--line);border-radius:16px;min-height:70px;font-size:1.5rem;font-weight:800}
+.choices button.sel{border-color:var(--brand);background:var(--soft)}
+.helpbar{display:flex;gap:8px;flex-wrap:wrap}
+.helpbar .btn{flex:1;min-width:120px}
+.hints{display:grid;gap:8px}
+.hint{background:var(--gold-soft);border-radius:14px;padding:10px 14px;font-size:1.05rem}
+.hint b{color:inherit}
+.steps{background:var(--soft);border-radius:14px;padding:12px 16px;display:grid;gap:6px}
+.steps ol{margin:0;padding-left:22px;display:grid;gap:6px}
+.fb{border-radius:16px;padding:14px 16px;display:grid;gap:8px;font-size:1.1rem}
+.fb.good{background:var(--good-soft)} .fb.bad{background:var(--bad-soft)} .fb.try{background:var(--gold-soft)}
+.fb h3{font-size:1.3rem}
+.toast{position:fixed;left:50%;top:calc(16px + env(safe-area-inset-top));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:999px;font-weight:800;z-index:20;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:calc(100% - 32px);text-align:center}
+.modal{position:fixed;inset:0;background:rgba(10,20,40,.5);z-index:30;display:grid;place-items:center;padding:16px}
+.modal .card{max-width:560px;width:100%;max-height:85vh;overflow:auto}
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.badge{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;display:grid;justify-items:center;text-align:center;gap:6px}
+.badge svg{width:56px;height:56px}
+.badge.locked{opacity:.4;filter:grayscale(1)}
+.badge small{color:var(--muted);font-size:.8rem}
+table{border-collapse:collapse;width:100%;font-size:.95rem}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.tw{overflow-x:auto}
+.code{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.8rem;white-space:nowrap}
+textarea{width:100%;min-height:90px;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:10px;font-size:.8rem}
+input[type=text],input[type=password],input[type=number]{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:10px 12px;width:100%}
+.lesson li{margin-bottom:8px}
+.big-num{font-size:2.4rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+</style>
+</head>
+<body>
+<main class="app" id="app"></main>
+<nav class="tabs" id="tabs" aria-label="Sections">
+  <button data-tab="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Home</button>
+  <button data-tab="learn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/><path d="M9 8h6M9 12h4"/></svg>Learn</button>
+  <button data-tab="trophies"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>Trophies</button>
+  <button data-tab="parents"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M17 4.5a3.5 3.5 0 0 1 0 7M21.5 20a6.5 6.5 0 0 0-4-6"/></svg>Grown-ups</button>
+</nav>
+<section class="qscreen" id="qscreen" hidden></section>
+<script src="engine.js"></script>
+<script>
+(function () {
+  "use strict";
+  const M = window.MathsLab;
+  const KEY = "coops-maths-lab-v1";
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const md = s => esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+  const fmtSec = s => { s = Math.max(0, Math.round(s)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
+
+  /* ---------- storage ---------- */
+  let S = null;
+  try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) { S = null; }
+  if (!S || S.v !== 1) S = M.newState();
+  // keep state in sync with any new skills added in later versions
+  M.SKILLS.forEach(s => { if (!S.skills[s.id]) S.skills[s.id] = { level: 2, mastery: 40, seen: 0, correct: 0, recent: [], lastSeen: null, levelUps: 0 }; });
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage blocked: progress lasts until the app closes */ } }
+  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+
+  let tab = "home", parentsOpen = false;
+
+  /* ---------- small UI helpers ---------- */
+  function toast(msg) { const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; document.body.append(t); setTimeout(() => t.remove(), 2600); }
+  function starSvg(on) { return `<svg class="star" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17l-5.9 3.3 1.3-6.5L2.5 9.3l6.6-.8z" fill="${on ? "var(--gold)" : "var(--line)"}"/></svg>`; }
+  const badgeSvg = (i) => { const hues = ["#3657e8", "#12925f", "#e6a700", "#d6452f", "#8a4fe0", "#0e93b5"]; const c = hues[i % hues.length]; return `<svg viewBox="0 0 56 56"><circle cx="28" cy="24" r="18" fill="${c}"/><circle cx="28" cy="24" r="12" fill="none" stroke="#fff" stroke-width="3" opacity=".7"/><path d="M18 38l-4 14 8-4 6 6 2-14M38 38l4 14-8-4-6 6" fill="${c}" opacity=".8"/><path d="M28 16l2.6 5.2 5.7.8-4.1 4 1 5.7L28 29l-5.2 2.7 1-5.7-4.1-4 5.7-.8z" fill="#fff"/></svg>`; };
+  const yearChip = l => `<span class="chip y${l}">${M.YEAR[l]}</span>`;
+  function modal(html, onMount) {
+    const m = document.createElement("div"); m.className = "modal"; m.innerHTML = `<div class="card" role="dialog" aria-modal="true">${html}</div>`;
+    m.addEventListener("click", e => { if (e.target === m || e.target.closest("[data-close]")) m.remove(); });
+    document.body.append(m); if (onMount) onMount(m); return m;
+  }
+
+  /* ---------- day record ---------- */
+  function todayRec(create) {
+    const t = M.today();
+    if (!S.days[t] && create) { S.days[t] = { qs: M.buildDaily(S, S.dailyCount), i: 0, results: [], total: 0, correct: 0, points: 0, timeSec: 0, helpUsed: 0, done: false }; S.days[t].total = S.days[t].qs.length; save(); }
+    return S.days[t] || null;
+  }
+
+  /* ---------- HOME ---------- */
+  function renderHome() {
+    const d = todayRec(false);
+    const n = d ? d.total : S.dailyCount, done = d ? d.i : 0;
+    const pct = n ? done / n : 0, C = 2 * Math.PI * 40;
+    const rk = M.rank(S.points);
+    const toNext = rk.next ? (S.points - rk.from) / (rk.next.at - rk.from) : 1;
+    // week strip Mon..Sun
+    const now = new Date(), dow = (now.getDay() + 6) % 7;
+    const week = Array.from({ length: 7 }, (_, i) => { const dt = new Date(now); dt.setDate(now.getDate() - dow + i); const key = M.today(dt); return { lab: "MTWTFSS"[i], on: S.days[key] && S.days[key].done, today: i === dow }; });
+    const weakest = M.SKILLS.filter(s => s.id !== "puzzle").map(s => ({ s, st: S.skills[s.id] })).sort((a, b) => a.st.mastery - b.st.mastery).slice(0, 3);
+    let missionBtn, missionText;
+    if (!d) { missionBtn = `<button class="btn big" id="go">Start mission</button>`; missionText = `${n} problems are waiting. Ready?`; }
+    else if (!d.done) { missionBtn = `<button class="btn big" id="go">Keep going</button>`; missionText = `${done} of ${n} done. ${n - done} to go!`; }
+    else { missionBtn = `<button class="btn big" id="bonus">Bonus round (5 more)</button>`; missionText = `Mission complete: ${d.correct}/${d.total} right in ${fmtSec(d.timeSec)}.`; }
+    $("#app").innerHTML = `
+      <div class="hello">
+        <div><p class="muted" style="margin:0">${new Date().toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "long" })}</p><h1>Hi ${esc(S.name)}!</h1></div>
+        <div class="stat"><span class="chip">🔥 ${S.streak.count} day streak</span><span class="chip">⭐ ${S.points.toLocaleString("en-AU")} pts</span><span class="chip">${rk.name}</span></div>
+      </div>
+      <section class="card mission">
+        <div class="row between" style="flex-wrap:nowrap">
+          <div style="display:grid;gap:8px;min-width:0">
+            <p class="muted" style="margin:0;font-weight:800;text-transform:uppercase;letter-spacing:.08em;font-size:.8rem">Today's mission</p>
+            <h2 style="font-size:1.7rem">${d && d.done ? "Done! Great work." : `${n} maths problems`}</h2>
+            <p style="margin:0">${missionText}</p>
+            ${d && d.done ? `<div class="stars">${[1, 2, 3].map(i => starSvg(i <= (d.stars || 0))).join("")}</div>` : ""}
+          </div>
+          <svg class="ring" viewBox="0 0 96 96" aria-label="${done} of ${n} done"><circle class="bgc" cx="48" cy="48" r="40"/><circle class="fg" cx="48" cy="48" r="40" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - pct)}" transform="rotate(-90 48 48)"/><text x="48" y="55" text-anchor="middle">${done}/${n}</text></svg>
+        </div>
+        <div>${missionBtn}</div>
+      </section>
+      <div class="grid2">
+        <section class="card">
+          <h3>This week</h3>
+          <div class="week">${week.map(w => `<span class="${w.on ? "on" : ""} ${w.today ? "today" : ""}">${w.lab}</span>`).join("")}</div>
+          <p class="muted" style="margin:0">${S.streak.count ? `Finish today's mission to keep your ${S.streak.count}-day streak going.` : "Finish a mission every day to build a streak."}</p>
+        </section>
+        <section class="card">
+          <div class="row between"><h3>Rank: ${rk.name}</h3><span class="muted">${rk.next ? `${(rk.next.at - S.points).toLocaleString("en-AU")} pts to ${rk.next.name}` : "Top rank!"}</span></div>
+          <div class="bar"><i style="width:${Math.round(toNext * 100)}%"></i></div>
+          <p class="muted" style="margin:0">Best run: ${S.bestInARow} right in a row · Puzzles solved: ${S.puzzlesSolved}</p>
+        </section>
+      </div>
+      <section class="card">
+        <div class="row between"><h3>Level these up</h3><button class="btn" data-tab-go="learn">All skills</button></div>
+        <div>${weakest.map(w => `<div class="skillrow"><div class="grow"><b>${w.s.name}</b><div class="bar"><i style="width:${w.st.mastery}%"></i></div></div>${yearChip(w.st.level)}<button class="btn primary" data-practise="${w.s.id}">Practise</button></div>`).join("")}</div>
+      </section>`;
+    const go = $("#go"); if (go) go.onclick = () => startDaily();
+    const bonus = $("#bonus"); if (bonus) bonus.onclick = () => startPractice(null);
+  }
+
+  /* ---------- LEARN ---------- */
+  function renderLearn() {
+    const strands = [...new Set(M.SKILLS.map(s => s.strand))];
+    $("#app").innerHTML = `<h1>Learn</h1><p class="muted" style="margin:-8px 0 0">Pick a skill to see how it works, watch an example, then have a go.</p>` +
+      strands.map(str => `<section class="card"><h3>${str}</h3><div>${M.SKILLS.filter(s => s.strand === str).map(s => { const st = S.skills[s.id]; return `<div class="skillrow"><div class="grow"><b>${s.name}</b><div class="bar"><i style="width:${st.mastery}%"></i></div></div>${yearChip(st.level)}<button class="btn" data-lesson="${s.id}">Learn</button><button class="btn primary" data-practise="${s.id}">Practise</button></div>`; }).join("")}</div></section>`).join("");
+  }
+  function openLesson(id) {
+    const sk = M.SKILL[id], st = S.skills[id];
+    const q = M.generate(id, st.level);
+    let shown = 0;
+    const m = modal(`<div class="row between"><h2>${sk.name}</h2>${yearChip(st.level)}</div>
+      <h3>How it works</h3><ul class="lesson">${M.LESSONS[id].map(x => `<li>${md(x)}</li>`).join("")}</ul>
+      <h3>Watch an example</h3><div class="prompt" style="font-size:1.2rem">${md(q.prompt)}</div>${diagram(q.diagram)}
+      <div class="steps"><ol id="lsteps"></ol></div>
+      <div class="row"><button class="btn" id="nextStep">Show first step</button><button class="btn primary" id="tryNow">Try 5 myself</button><button class="btn" data-close>Close</button></div>`, mm => {
+      const nx = mm.querySelector("#nextStep"), ol = mm.querySelector("#lsteps");
+      nx.onclick = () => { if (shown < q.steps.length) { const li = document.createElement("li"); li.innerHTML = md(q.steps[shown]); ol.append(li); shown++; } nx.textContent = shown >= q.steps.length ? "Done! Try one yourself" : "Next step"; if (shown >= q.steps.length) nx.disabled = true; };
+      mm.querySelector("#tryNow").onclick = () => { mm.remove(); startPractice(id); };
+    });
+    return m;
+  }
+
+  /* ---------- TROPHIES ---------- */
+  function renderTrophies() {
+    const got = Object.keys(S.badges).length;
+    $("#app").innerHTML = `<h1>Trophies</h1>
+      <div class="grid2">
+        <section class="card"><span class="muted">Points</span><span class="big-num">${S.points.toLocaleString("en-AU")}</span><span class="muted">Rank: ${M.rank(S.points).name}</span></section>
+        <section class="card"><span class="muted">Streak</span><span class="big-num">${S.streak.count} day${S.streak.count === 1 ? "" : "s"}</span><span class="muted">Best run: ${S.bestInARow} right in a row</span></section>
+        <section class="card"><span class="muted">Fastest mission (80%+ right)</span><span class="big-num">${S.bestTime ? fmtSec(S.bestTime) : "–"}</span><span class="muted">Puzzles solved: ${S.puzzlesSolved}</span></section>
+      </div>
+      <section class="card"><h3>Badges · ${got} of ${M.BADGES.length}</h3>
+      <div class="badges">${M.BADGES.map((b, i) => `<div class="badge ${S.badges[b.id] ? "" : "locked"}">${badgeSvg(i)}<b>${b.name}</b><small>${b.desc}</small>${S.badges[b.id] ? `<small>Won ${new Date(S.badges[b.id]).toLocaleDateString("en-AU", { day: "numeric", month: "short" })}</small>` : ""}</div>`).join("")}</div></section>
+      <section class="card"><h3>Ranks</h3><div class="row">${M.RANKS.map(r => `<span class="chip" style="${S.points >= r[0] ? "background:var(--brand);color:var(--on-brand)" : ""}">${r[1]} · ${r[0].toLocaleString("en-AU")}</span>`).join("")}</div></section>`;
+  }
+
+  /* ---------- GROWN-UPS ---------- */
+  function renderParents() {
+    if (S.pin && !parentsOpen) {
+      $("#app").innerHTML = `<h1>Grown-ups</h1><section class="card" style="max-width:420px"><h3>Enter PIN</h3><input type="password" inputmode="numeric" id="pin" maxlength="8" autocomplete="off"><button class="btn primary" id="pinGo">Open</button><p class="muted" id="pinMsg" style="margin:0"></p></section>`;
+      const go = () => { if ($("#pin").value === S.pin) { parentsOpen = true; renderParents(); } else { $("#pinMsg").textContent = "That PIN isn't right."; } };
+      $("#pinGo").onclick = go; $("#pin").onkeydown = e => { if (e.key === "Enter") go(); };
+      return;
+    }
+    const rep = M.report(S);
+    // last 14 days
+    const days = []; for (let i = 13; i >= 0; i--) { const dt = new Date(); dt.setDate(dt.getDate() - i); days.push(M.today(dt)); }
+    const perDay = days.map(d => { const h = S.history.filter(x => x.d === d); return { d, n: h.length, ok: h.filter(x => x.ok).length, done: S.days[d] && S.days[d].done }; });
+    const maxN = Math.max(10, ...perDay.map(p => p.n));
+    const W = 560, H = 160, bw = W / 14;
+    const chart = `<svg viewBox="0 0 ${W} ${H + 24}" role="img" aria-label="Questions answered in the last 14 days">
+      ${[0.5, 1].map(f => `<line x1="0" x2="${W}" y1="${H - f * H}" y2="${H - f * H}" stroke="var(--line)"/>`).join("")}
+      ${perDay.map((p, i) => { const h = (p.n / maxN) * H, ho = (p.ok / maxN) * H; return `<rect x="${i * bw + 6}" y="${H - h}" width="${bw - 12}" height="${h}" rx="4" fill="var(--bad-soft)"/><rect x="${i * bw + 6}" y="${H - ho}" width="${bw - 12}" height="${ho}" rx="4" fill="var(--good)"/>${p.n ? `<text x="${i * bw + bw / 2}" y="${H - h - 4}" text-anchor="middle" font-size="11" fill="var(--muted)">${Math.round(100 * p.ok / p.n)}%</text>` : ""}<text x="${i * bw + bw / 2}" y="${H + 16}" text-anchor="middle" font-size="11" fill="var(--muted)">${new Date(p.d).getDate()}</text>`; }).join("")}
+    </svg>`;
+    const total = S.history.length, right = S.history.filter(x => x.ok).length;
+    $("#app").innerHTML = `<h1>Grown-ups</h1>
+      <div class="grid2">
+        <section class="card"><span class="muted">Questions answered</span><span class="big-num">${total}</span><span class="muted">${total ? Math.round(100 * right / total) : 0}% right overall</span></section>
+        <section class="card"><span class="muted">Missions finished</span><span class="big-num">${Object.values(S.days).filter(d => d.done).length}</span><span class="muted">Streak ${S.streak.count} · started ${new Date(S.created).toLocaleDateString("en-AU")}</span></section>
+      </div>
+      <section class="card"><h3>Last 14 days</h3><p class="muted" style="margin:0">Green = right, pink = wrong. Percentage = accuracy that day.</p><div class="tw">${chart}</div></section>
+      <section class="card"><h3>Progress by NSW syllabus outcome</h3>
+        <p class="muted" style="margin:0">Levels: Year 4 = late Stage 2, Year 5 = Stage 3, Year 6+ = extension. Mastery weighs recent answers and help used. Accuracy is the last 20 answers.</p>
+        <div class="tw"><table><thead><tr><th>Outcome</th><th>Skill</th><th>Level</th><th>Mastery</th><th>Accuracy</th><th>Status</th></tr></thead><tbody>
+        ${rep.map(r => `<tr><td class="code">${r.code}</td><td>${r.name}</td><td>${yearChip(r.level)}</td><td style="min-width:110px"><div class="bar"><i style="width:${r.mastery}%"></i></div></td><td>${r.acc == null ? "–" : r.acc + "%"}</td><td>${r.status}</td></tr>`).join("")}
+        </tbody></table></div></section>
+      <section class="card"><h3>Settings</h3>
+        <label class="muted">Name<input type="text" id="setName" value="${esc(S.name)}"></label>
+        <label class="muted">Daily problems: <b id="dcLabel">${S.dailyCount}</b><input type="range" id="setCount" min="10" max="20" value="${S.dailyCount}" style="width:100%"></label>
+        <div class="row"><span class="muted">Set every skill to:</span>${[1, 2, 3].map(l => `<button class="btn" data-setlevel="${l}">${M.YEAR[l]}</button>`).join("")}</div>
+        <div class="row"><label class="muted" style="flex:1">Grown-ups PIN (blank = none)<input type="password" inputmode="numeric" id="setPin" maxlength="8" value="${esc(S.pin || "")}"></label></div>
+        <div class="row"><button class="btn primary" id="saveSet">Save settings</button><span class="muted" id="setMsg"></span></div>
+      </section>
+      <section class="card"><h3>Backup</h3>
+        <p class="muted" style="margin:0">Progress is saved on this iPad only. Copy the backup code now and then (paste it into Notes or an email). To move to another device, paste it below and press Restore.</p>
+        <div class="row"><button class="btn" id="mkBackup">Make backup code</button><button class="btn" id="cpBackup" hidden>Copy</button></div>
+        <textarea id="backup" placeholder="Backup code appears here, or paste one to restore"></textarea>
+        <div class="row"><button class="btn" id="restore">Restore from code</button><button class="btn" id="resetAll" style="color:var(--bad)">Reset all progress</button><span class="muted" id="bkMsg"></span></div>
+      </section>`;
+    $("#setCount").oninput = e => $("#dcLabel").textContent = e.target.value;
+    $("#saveSet").onclick = () => { S.name = $("#setName").value.trim() || "Cooper"; S.dailyCount = +$("#setCount").value; S.pin = $("#setPin").value.trim() || null; save(); $("#setMsg").textContent = "Saved. New daily count starts with tomorrow's mission."; };
+    document.querySelectorAll("[data-setlevel]").forEach(b => b.onclick = () => { const l = +b.dataset.setlevel; M.SKILLS.forEach(s => { if (s.id !== "puzzle") { S.skills[s.id].level = l; S.skills[s.id].recent = []; } }); save(); renderParents(); toast(`All skills set to ${M.YEAR[l]}`); });
+    const enc = o => btoa(unescape(encodeURIComponent(JSON.stringify(o))));
+    $("#mkBackup").onclick = () => { $("#backup").value = enc(S); $("#cpBackup").hidden = false; $("#bkMsg").textContent = ""; };
+    $("#cpBackup").onclick = () => { const t = $("#backup"); (navigator.clipboard ? navigator.clipboard.writeText(t.value) : Promise.reject()).then(() => $("#bkMsg").textContent = "Copied.", () => { t.select(); $("#bkMsg").textContent = "Selected: press Copy."; }); };
+    $("#restore").onclick = () => {
+      let o; try { o = JSON.parse(decodeURIComponent(escape(atob($("#backup").value.trim())))); } catch (e) { o = null; }
+      if (!o || o.v !== 1 || !o.skills) { $("#bkMsg").textContent = "That code doesn't look right. Check you copied all of it."; return; }
+      modal(`<h3>Replace progress?</h3><p>This replaces everything on this device with the backup.</p><div class="row"><button class="btn primary" id="yes">Restore</button><button class="btn" data-close>Cancel</button></div>`, mm => mm.querySelector("#yes").onclick = () => { S = o; save(); mm.remove(); renderParents(); toast("Backup restored"); });
+    };
+    $("#resetAll").onclick = () => modal(`<h3>Reset all progress?</h3><p>Points, badges, streaks and levels go back to the start. This can't be undone unless you have a backup code.</p><div class="row"><button class="btn" style="background:var(--bad);color:#fff" id="yes">Reset</button><button class="btn" data-close>Cancel</button></div>`, mm => mm.querySelector("#yes").onclick = () => { const keep = { name: S.name, pin: S.pin, dailyCount: S.dailyCount }; S = Object.assign(M.newState(keep.name), keep); save(); mm.remove(); renderParents(); toast("Progress reset"); });
+  }
+
+  /* ---------- diagrams ---------- */
+  function diagram(d) {
+    if (!d) return "";
+    const T = (x, y, t, a = "middle", sz = 15) => `<text x="${x}" y="${y}" text-anchor="${a}" font-size="${sz}" font-weight="700" fill="var(--ink)" font-family="inherit">${esc(t)}</text>`;
+    const stroke = `stroke="var(--brand)" stroke-width="3" fill="var(--soft)"`;
+    let svg = "";
+    if (d.k === "rect") {
+      const maxW = 240, maxH = 140, sc = Math.min(maxW / d.w, maxH / d.h), w = d.w * sc, h = d.h * sc;
+      svg = `<svg viewBox="0 0 ${w + 90} ${h + 50}" width="${w + 90}"><rect x="20" y="10" width="${w}" height="${h}" ${stroke}/>${T(20 + w / 2, h + 36, d.wl)}${T(w + 28, 10 + h / 2 + 5, d.hl, "start")}</svg>`;
+    } else if (d.k === "tri") {
+      const sc = Math.min(240 / d.b, 140 / d.h), b = d.b * sc, h = d.h * sc, apx = 20 + b * 0.35;
+      svg = `<svg viewBox="0 0 ${b + 100} ${h + 50}" width="${b + 100}"><polygon points="20,${h + 10} ${20 + b},${h + 10} ${apx},10" ${stroke}/><line x1="${apx}" y1="10" x2="${apx}" y2="${h + 10}" stroke="var(--ink)" stroke-dasharray="5 4" stroke-width="2"/><rect x="${apx}" y="${h}" width="10" height="10" fill="none" stroke="var(--ink)"/>${T(20 + b / 2, h + 36, d.bl)}${T(apx + 8, 10 + h / 2, d.hl, "start")}</svg>`;
+    } else if (d.k === "lshape") {
+      const sc = Math.min(240 / d.W, 150 / d.H), W = d.W * sc, H = d.H * sc, cw = d.cw * sc, ch = d.ch * sc, x0 = 50, y0 = 14;
+      svg = `<svg viewBox="0 0 ${W + 130} ${H + 52}" width="${W + 130}"><polygon points="${x0},${y0} ${x0 + W - cw},${y0} ${x0 + W - cw},${y0 + ch} ${x0 + W},${y0 + ch} ${x0 + W},${y0 + H} ${x0},${y0 + H}" ${stroke}/>${T(x0 + W / 2, y0 + H + 26, d.W + " cm")}${T(x0 - 8, y0 + H / 2, d.H + " cm", "end")}${T(x0 + W - cw / 2, y0 + ch + 20, d.cw + " cm", "middle", 13)}${T(x0 + W - cw - 6, y0 + ch / 2 + 5, d.ch + " cm", "end", 13)}<rect x="${x0 + W - cw}" y="${y0}" width="${cw}" height="${ch}" fill="none" stroke="var(--muted)" stroke-dasharray="4 4"/></svg>`;
+    } else if (d.k === "line") {
+      const a = d.a * Math.PI / 180, cx = 150, cy = 120, L = 110, ex = cx + L * Math.cos(a), ey = cy - L * Math.sin(a);
+      const mid1 = a / 2, mid2 = (a + Math.PI) / 2;
+      svg = `<svg viewBox="0 0 300 150" width="300"><line x1="30" y1="${cy}" x2="270" y2="${cy}" stroke="var(--brand)" stroke-width="4"/><line x1="${cx}" y1="${cy}" x2="${ex}" y2="${ey}" stroke="var(--brand)" stroke-width="4"/>${T(cx + 50 * Math.cos(mid1), cy - 50 * Math.sin(mid1) + 5, d.a + "°")}${T(cx + 50 * Math.cos(mid2), cy - 50 * Math.sin(mid2) + 5, d.x)}</svg>`;
+    } else if (d.k === "point") {
+      const cx = 140, cy = 110, L = 95, angs = [0, d.a, d.a + d.b].map(x => x * Math.PI / 180);
+      const lab = [[d.a, d.a + "°"], [d.b, d.b + "°"], [360 - d.a - d.b, d.x]];
+      let acc = 0;
+      svg = `<svg viewBox="0 0 280 220" width="280">${angs.map(t => `<line x1="${cx}" y1="${cy}" x2="${cx + L * Math.cos(t)}" y2="${cy - L * Math.sin(t)}" stroke="var(--brand)" stroke-width="4"/>`).join("")}<circle cx="${cx}" cy="${cy}" r="4" fill="var(--ink)"/>${lab.map(([deg, t]) => { const m = (acc + deg / 2) * Math.PI / 180; acc += deg; return T(cx + 52 * Math.cos(m), cy - 52 * Math.sin(m) + 5, t); }).join("")}</svg>`;
+    } else if (d.k === "triangle") {
+      const P = [[30, 170], [270, 170], [120, 20]];
+      const labs = d.top != null ? [d.a, d.b, d.top + "°"] : [d.a + "°", d.b + "°", d.x];
+      const fmtL = v => (typeof v === "number" ? v + "°" : v);
+      svg = `<svg viewBox="0 0 300 200" width="300"><polygon points="${P.map(p => p.join(",")).join(" ")}" ${stroke}/>${T(62, 160, fmtL(labs[0]))}${T(232, 160, fmtL(labs[1]))}${T(124, 58, fmtL(labs[2]))}</svg>`;
+    } else if (d.k === "prism") {
+      const sc = Math.min(22, 170 / (d.l + d.w * 0.5), 120 / (d.h + d.w * 0.5)), l = d.l * sc, w = d.w * sc * 0.5, h = d.h * sc, x0 = 30, y0 = 20 + w;
+      const front = `${x0},${y0} ${x0 + l},${y0} ${x0 + l},${y0 + h} ${x0},${y0 + h}`, top = `${x0},${y0} ${x0 + w},${y0 - w} ${x0 + l + w},${y0 - w} ${x0 + l},${y0}`, side = `${x0 + l},${y0} ${x0 + l + w},${y0 - w} ${x0 + l + w},${y0 + h - w} ${x0 + l},${y0 + h}`;
+      let grid = "";
+      if (d.cubes) {
+        for (let i = 1; i < d.l; i++) grid += `<line x1="${x0 + i * sc}" y1="${y0}" x2="${x0 + i * sc}" y2="${y0 + h}" stroke="var(--brand)" opacity=".5"/><line x1="${x0 + i * sc}" y1="${y0}" x2="${x0 + i * sc + w}" y2="${y0 - w}" stroke="var(--brand)" opacity=".5"/>`;
+        for (let j = 1; j < d.h; j++) grid += `<line x1="${x0}" y1="${y0 + j * sc}" x2="${x0 + l}" y2="${y0 + j * sc}" stroke="var(--brand)" opacity=".5"/><line x1="${x0 + l}" y1="${y0 + j * sc}" x2="${x0 + l + w}" y2="${y0 + j * sc - w}" stroke="var(--brand)" opacity=".5"/>`;
+        for (let k = 1; k < d.w; k++) { const f = k / d.w; grid += `<line x1="${x0 + f * w}" y1="${y0 - f * w}" x2="${x0 + l + f * w}" y2="${y0 - f * w}" stroke="var(--brand)" opacity=".5"/><line x1="${x0 + l + f * w}" y1="${y0 - f * w}" x2="${x0 + l + f * w}" y2="${y0 + h - f * w}" stroke="var(--brand)" opacity=".5"/>`; }
+      }
+      const W2 = l + w + 120, H2 = h + w + 60;
+      svg = `<svg viewBox="0 0 ${W2} ${H2}" width="${W2}"><polygon points="${top}" fill="var(--brand-2)" opacity=".35" stroke="var(--brand)" stroke-width="2"/><polygon points="${side}" fill="var(--brand)" opacity=".25" stroke="var(--brand)" stroke-width="2"/><polygon points="${front}" fill="var(--soft)" stroke="var(--brand)" stroke-width="3"/>${grid}${d.ll ? T(x0 + l / 2, y0 + h + 24, d.ll) + T(x0 + l + w / 2 + 14, y0 + h - w / 2 + 16, d.wl, "start", 13) + T(x0 - 6, y0 + h / 2 + 5, d.hl, "end") : ""}</svg>`;
+    } else if (d.k === "bag") {
+      const cols = { red: "#e0533f", blue: "#3657e8", green: "#12925f" }; const list = []; Object.entries(d.counts).forEach(([c, n]) => { for (let i = 0; i < n; i++) list.push(cols[c]); });
+      const per = 8, rows = Math.ceil(list.length / per);
+      svg = `<svg viewBox="0 0 ${per * 30 + 20} ${rows * 30 + 20}" width="${per * 30 + 20}">${list.map((c, i) => `<circle cx="${25 + (i % per) * 30}" cy="${25 + Math.floor(i / per) * 30}" r="12" fill="${c}"/>`).join("")}</svg>`;
+    }
+    return `<div class="diagram">${svg}</div>`;
+  }
+
+  /* ---------- QUESTION FLOW ---------- */
+  let run = null, tick = null;
+  function startDaily() { const d = todayRec(true); if (d.done) return; run = { mode: "daily", qs: d.qs, i: d.i, day: d, results: d.results || [], pts: d.points, levelEvents: [], newBadges: [] }; openQ(); }
+  function startPractice(skill) {
+    const qs = [];
+    for (let i = 0; i < 5; i++) { const id = skill || M.SKILLS[Math.floor(Math.random() * M.SKILLS.length)].id; qs.push(M.generate(id, S.skills[id].level)); }
+    run = { mode: "practice", skill, qs, i: 0, results: [], pts: 0, levelEvents: [], newBadges: [], timeSec: 0, correct: 0 }; openQ();
+  }
+  function openQ() { $("#qscreen").hidden = false; document.body.style.overflow = "hidden"; newQuestion(); }
+  function closeQ() { clearInterval(tick); $("#qscreen").hidden = true; document.body.style.overflow = ""; run = null; save(); render(); }
+
+  let cur = null;
+  function newQuestion() {
+    const q = run.qs[run.i];
+    cur = { q, input: "", choice: null, help: 0, hintsShown: 0, tries: 1, t0: Date.now(), state: "ask", shown: false };
+    drawQ();
+    clearInterval(tick); tick = setInterval(updTimer, 1000);
+  }
+  const secs = () => (Date.now() - cur.t0) / 1000;
+  function updTimer() { const el = $("#timer"); if (!el || !cur) return; const s = secs(); el.textContent = fmtSec(s); el.classList.toggle("over", s > cur.q.target); }
+  function drawQ() {
+    const q = cur.q, sk = M.SKILL[q.skill], n = run.qs.length;
+    const prog = run.qs.map((_, i) => `<i class="${i < run.results.length ? (run.results[i] ? "ok" : "no") : i === run.i ? "cur" : ""}"></i>`).join("");
+    const isChoice = q.answer.t === "choice";
+    const ph = q.answer.t === "frac" ? "type like 3/4" : q.answer.t === "time" ? "type like 14:30" : "type your answer";
+    const answered = cur.state !== "ask" && cur.state !== "retry";
+    $("#qscreen").innerHTML = `<div class="qwrap">
+      <div class="qtop"><button class="x" id="qclose" aria-label="Save and exit">×</button><div class="prog">${prog}</div><span class="timer" id="timer">${fmtSec(secs())}</span></div>
+      <div class="row between"><span class="chip">${sk.name}</span><span class="row" style="gap:8px">${yearChip(q.level)}<span class="chip">⭐ ${run.pts}</span><span class="muted">${run.i + 1} of ${n}</span></span></div>
+      <div class="qbody">
+        <section class="card">
+          <div class="prompt">${md(q.prompt)}</div>
+          ${diagram(q.diagram)}
+          <div class="hints" id="hints">${q.hints.slice(0, cur.hintsShown).map((h, i) => `<div class="hint"><b>Hint ${i + 1}:</b> ${md(h)}</div>`).join("")}</div>
+          ${cur.shown || answered ? `<div class="steps"><b>How to solve it</b><ol>${q.steps.map(s => `<li>${md(s)}</li>`).join("")}</ol></div>` : ""}
+          ${feedbackHtml()}
+        </section>
+        <section style="display:grid;gap:10px;align-content:start">
+          ${isChoice ? `<div class="choices">${q.answer.o.map((o, i) => `<button data-choice="${i}" class="${cur.choice === i ? "sel" : ""}" ${answered ? "disabled" : ""}>${esc(o)}</button>`).join("")}</div>` :
+            `<div class="answer ${answered ? "" : "focus"}" id="ansbox"><span class="val">${cur.input ? esc(cur.input) : `<span class="ph">${ph}</span>`}</span>${q.unit ? `<span class="unit">${esc(q.unit)}</span>` : ""}</div>`}
+          ${answered ? `<button class="btn primary big" id="next">${run.i + 1 >= n ? "See results" : "Next question"}</button>` : `
+            ${isChoice ? `<button class="btn primary big" id="checkBtn" ${cur.choice == null ? "disabled" : ""}>Check</button>` : `<div class="keypad">${["7", "8", "9", "⌫", "4", "5", "6", "/", "1", "2", "3", ":", "0", "."].map(k => `<button data-k="${k}" aria-label="${k === "⌫" ? "Delete" : k}">${k}</button>`).join("")}<button class="check" id="checkBtn">Check</button></div>`}
+            <div class="helpbar">
+              <button class="btn" id="hintBtn" ${cur.hintsShown >= q.hints.length ? "disabled" : ""}>Hint ${cur.hintsShown < q.hints.length ? `(${cur.hintsShown + 1} of ${q.hints.length})` : ""}</button>
+              <button class="btn" id="methodBtn">How does this work?</button>
+              <button class="btn" id="showBtn" ${cur.shown ? "disabled" : ""}>Show me</button>
+            </div>`}
+        </section>
+      </div></div>`;
+    $("#qclose").onclick = () => { if (run.mode === "daily") { save(); } closeQ(); };
+    document.querySelectorAll("[data-k]").forEach(b => b.onclick = () => key(b.dataset.k));
+    document.querySelectorAll("[data-choice]").forEach(b => b.onclick = () => { cur.choice = +b.dataset.choice; drawQ(); });
+    const cb = $("#checkBtn"); if (cb) cb.onclick = submit;
+    const nb = $("#next"); if (nb) nb.onclick = advance;
+    const hb = $("#hintBtn"); if (hb) hb.onclick = () => { cur.hintsShown++; cur.help = Math.max(cur.help, Math.min(2, cur.hintsShown)); drawQ(); };
+    const mb = $("#methodBtn"); if (mb) mb.onclick = () => { cur.help = Math.max(cur.help, 1); modal(`<h2>${sk.name}</h2><ul class="lesson">${M.LESSONS[q.skill].map(x => `<li>${md(x)}</li>`).join("")}</ul><button class="btn primary" data-close>Back to the question</button>`); };
+    const sb = $("#showBtn"); if (sb) sb.onclick = () => { cur.shown = true; cur.help = 3; drawQ(); };
+    updTimer();
+  }
+  function feedbackHtml() {
+    if (cur.state === "retry") return `<div class="fb try"><h3>Not quite. Have another go!</h3><span>Check your working, or tap Hint if you're stuck.</span></div>`;
+    if (cur.state === "right") return `<div class="fb good"><h3>${pickPraise()} +${cur.pts} points</h3>${cur.fast && cur.help === 0 ? `<span>Speed bonus: under ${fmtSec(cur.q.target)}!</span>` : ""}</div>`;
+    if (cur.state === "wrong") return `<div class="fb bad"><h3>The answer is ${esc(M.answerText(cur.q.answer))}${cur.q.unit ? " " + esc(cur.q.unit) : ""}</h3><span>Read through the steps above. You'll see this kind again soon.</span></div>`;
+    return "";
+  }
+  const PRAISE = ["Nailed it!", "Correct!", "Awesome!", "Brilliant!", "Spot on!", "Too easy!", "Legend!"];
+  let praise = PRAISE[0]; const pickPraise = () => praise;
+  function key(k) {
+    if (cur.state !== "ask" && cur.state !== "retry") return;
+    if (k === "⌫") cur.input = cur.input.slice(0, -1); else if (cur.input.length < 14) cur.input += k;
+    if (cur.state === "retry") cur.state = "ask";
+    const v = $("#ansbox .val"); if (v) v.innerHTML = cur.input ? esc(cur.input) : `<span class="ph">type your answer</span>`;
+  }
+  function submit() {
+    const q = cur.q, val = q.answer.t === "choice" ? cur.choice : cur.input;
+    if (val === "" || val == null) return;
+    const ok = M.check(q.answer, val);
+    if (!ok && cur.tries === 1 && !cur.shown) {
+      cur.tries = 2; cur.state = "retry"; cur.input = q.answer.t === "choice" ? cur.input : ""; drawQ();
+      const box = $("#ansbox"); if (box) { box.classList.remove("shake"); void box.offsetWidth; box.classList.add("shake"); }
+      return;
+    }
+    const s = secs();
+    clearInterval(tick);
+    const res = M.record(S, q, ok, cur.help, cur.tries, s);
+    cur.pts = res.pts; cur.fast = res.fast; cur.state = ok ? "right" : "wrong";
+    praise = PRAISE[Math.floor(Math.random() * PRAISE.length)];
+    run.results.push(ok ? 1 : 0); run.pts += res.pts;
+    res.events.forEach(e => { if (e.type === "levelup") { run.levelEvents.push(e); toast(`Level up! ${M.SKILL[e.skill].name} is now ${M.YEAR[e.level]}`); } });
+    const nb = M.checkBadges(S); nb.forEach(b => { run.newBadges.push(b); toast(`New badge: ${b.name}`); });
+    if (run.mode === "daily") { const d = run.day; d.results = run.results; d.correct += ok ? 1 : 0; d.points += res.pts; d.timeSec += Math.round(s); if (cur.help > 0) d.helpUsed++; d.i = run.i + 1; }
+    else { run.correct += ok ? 1 : 0; run.timeSec += s; }
+    save(); drawQ();
+  }
+  function advance() {
+    run.i++;
+    if (run.i < run.qs.length) { newQuestion(); return; }
+    clearInterval(tick);
+    if (run.mode === "daily") { const d = run.day; d.done = true; const nb = M.finishDay(S, d); run.newBadges.push(...nb); save(); results(d.correct, d.total, d.timeSec, d.points, d.stars); }
+    else results(run.correct, run.qs.length, run.timeSec, run.pts, null);
+  }
+  function results(correct, total, t, pts, stars) {
+    const lv = run.levelEvents, bd = run.newBadges, daily = run.mode === "daily";
+    $("#qscreen").innerHTML = `<div class="qwrap" style="max-width:640px">
+      <section class="card" style="text-align:center;justify-items:center">
+        <h1>${daily ? "Mission complete!" : "Practice done!"}</h1>
+        ${stars ? `<div class="stars" style="transform:scale(1.6);margin:10px 0">${[1, 2, 3].map(i => starSvg(i <= stars)).join("")}</div>` : ""}
+        <div class="row" style="justify-content:center;gap:28px">
+          <div><div class="big-num">${correct}/${total}</div><span class="muted">right</span></div>
+          <div><div class="big-num">${fmtSec(t)}</div><span class="muted">time</span></div>
+          <div><div class="big-num">+${pts}</div><span class="muted">points</span></div>
+        </div>
+        ${daily ? `<p style="margin:0">🔥 ${S.streak.count} day streak${S.bestTime && Math.round(t) <= S.bestTime && correct / total >= 0.8 ? " · New best time!" : ""}</p>` : ""}
+        ${lv.length ? `<div style="display:grid;gap:6px">${lv.map(e => `<span class="chip y${e.level}">Level up: ${M.SKILL[e.skill].name} → ${M.YEAR[e.level]}</span>`).join("")}</div>` : ""}
+        ${bd.length ? `<div class="badges" style="width:100%">${bd.map(b => `<div class="badge">${badgeSvg(M.BADGES.indexOf(b))}<b>${b.name}</b><small>${b.desc}</small></div>`).join("")}</div>` : ""}
+        <div class="row" style="justify-content:center"><button class="btn primary big" id="home">Back home</button>${!daily ? `<button class="btn big" id="again">Go again</button>` : ""}</div>
+      </section></div>`;
+    $("#home").onclick = closeQ;
+    const ag = $("#again"); if (ag) { const sk = run.skill; ag.onclick = () => { clearInterval(tick); startPractice(sk); }; }
+  }
+  // physical keyboard support (desktop testing / iPad keyboard)
+  document.addEventListener("keydown", e => {
+    if ($("#qscreen").hidden || !cur || document.querySelector(".modal")) return;
+    if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return;
+    if (/^[0-9./:]$/.test(e.key)) { key(e.key); e.preventDefault(); }
+    else if (e.key === "Backspace") { key("⌫"); e.preventDefault(); }
+    else if (e.key === "Enter") { e.preventDefault(); if (cur.state === "right" || cur.state === "wrong") advance(); else submit(); }
+  });
+
+  /* ---------- tabs & routing ---------- */
+  function render() {
+    document.querySelectorAll("#tabs [data-tab]").forEach(b => b.setAttribute("aria-current", b.dataset.tab === tab ? "page" : "false"));
+    if (tab === "home") renderHome(); else if (tab === "learn") renderLearn(); else if (tab === "trophies") renderTrophies(); else renderParents();
+    window.scrollTo(0, 0);
+  }
+  document.querySelectorAll("#tabs [data-tab]").forEach(b => b.onclick = () => { tab = b.dataset.tab; if (tab !== "parents") parentsOpen = false; render(); });
+  document.addEventListener("click", e => {
+    const p = e.target.closest("[data-practise]"); if (p) { startPractice(p.dataset.practise); return; }
+    const l = e.target.closest("[data-lesson]"); if (l) { openLesson(l.dataset.lesson); return; }
+    const t = e.target.closest("[data-tab-go]"); if (t) { tab = t.dataset.tabGo; render(); }
+  });
+  // first launch: say hello
+  if (!S.history.length && !S.seenIntro) {
+    S.seenIntro = true; save();
+    setTimeout(() => modal(`<h2>Welcome to the Maths Lab!</h2><p>Every day there's a <b>mission</b>: ${S.dailyCount} problems, including brain-bending puzzles.</p><ul class="lesson"><li>Stuck? Tap <b>Hint</b>. <b>How does this work?</b> explains the method. <b>Show me</b> walks you through it, but you get fewer points.</li><li>Get it right with no help, fast, for bonus points.</li><li>Get questions right and the app moves you up a level. Year 6+ is the top!</li><li>Keep a daily streak going to win badges.</li></ul><button class="btn primary big" data-close>Let's go</button>`), 300);
+  }
+  render();
+  if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
+})();
+</script>
+</body>
+</html>
