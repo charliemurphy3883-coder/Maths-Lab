@@ -101,6 +101,7 @@ h1{font-size:2.3rem} h2{font-size:1.5rem} h3{font-size:1.2rem}
 .prompt{font-size:1.6rem;font-weight:600;line-height:1.3;flex:1;min-width:0}
 .prompt b{color:var(--purple)}
 .nw{white-space:nowrap}
+.ver{position:fixed;top:calc(8px + env(safe-area-inset-top));right:max(10px,env(safe-area-inset-right));z-index:4;background:rgba(255,255,255,.92);color:var(--ink);font-weight:700;font-size:.8rem;padding:4px 10px;border-radius:999px;box-shadow:0 3px 0 rgba(36,22,79,.15);pointer-events:none}
 .speak{background:var(--teal);color:#fff;border-radius:16px;padding:8px 14px;font-weight:700;box-shadow:0 4px 0 #0b8f95;display:inline-flex;gap:6px;align-items:center}
 .speak svg{width:22px;height:22px}
 .diagram{display:flex;justify-content:center}
@@ -169,6 +170,7 @@ input[type=text],input[type=password]{border:2px solid var(--line);background:va
 </style>
 </head>
 <body>
+<div class="ver" id="ver" aria-label="App version"></div>
 <main class="app" id="app"></main>
 <nav class="tabs" id="tabs" aria-label="Sections">
   <button data-tab="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Home</button>
@@ -182,6 +184,7 @@ input[type=text],input[type=password]{border:2px solid var(--line);background:va
 <script>
 (function () {
   "use strict";
+  const APP_VERSION = "v2.4 · 31 Oct";
   const M = window.MathsLab;
   const KEY = "coops-maths-lab-v1";
   const $ = s => document.querySelector(s);
@@ -717,6 +720,7 @@ input[type=text],input[type=password]{border:2px solid var(--line);background:va
     S.seenIntro2 = true; save();
     setTimeout(() => modal(`<div class="row" style="flex-wrap:nowrap;align-items:flex-start">${mascot("wow", "bob")}<div><h2>Hi! I'm Bolt.</h2><p style="margin:6px 0 0">Welcome to the Maths Lab!</p></div></div><ul class="lesson"><li>Every day there's a <b>mission</b>: ${S.dailyCount} problems, plus brain-bending puzzles.</li><li>I'll read each question out loud. Tap <b>Read it to me</b> to hear it again.</li><li>Stuck? Tap <b>💡 Hint</b>. <b>📘 How does it work?</b> explains the method. <b>👀 Show me</b> walks you through it, but you get fewer points.</li><li>Get it right with no help, fast, for bonus points ⚡</li><li>Get lots right and you level up. Year 6+ is the top!</li></ul><button class="btn green big" data-close id="letsgo">Let's go! 🚀</button>`, mm => { mm.querySelectorAll(".mascot").forEach(s => { s.style.width = "90px"; s.style.height = "90px"; s.style.flex = "none"; }); mm.querySelector("#letsgo").addEventListener("click", () => { audio(); sfx("finish"); say(`Let's go, ${S.name}!`); }); }), 300);
   }
+  $("#ver").textContent = APP_VERSION;
   render();
   if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
 })();
