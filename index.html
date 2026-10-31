@@ -131,7 +131,7 @@ h1{font-size:2.3rem} h2{font-size:1.5rem} h3{font-size:1.2rem}
 .fb{border-radius:18px;padding:14px 16px;display:grid;gap:6px;font-size:1.15rem}
 .fb.good{background:#d9f9e7;border:3px solid var(--green)} .fb.bad{background:#ffe3e4;border:3px solid var(--red)} .fb.try{background:#fff3cf;border:3px solid var(--yellow)}
 .fb h3{font-size:1.45rem}
-.nudge{position:absolute;right:12px;top:12px;background:#fff;border:3px solid var(--purple);border-radius:20px;padding:10px 14px;display:grid;gap:8px;max-width:300px;z-index:2;box-shadow:0 8px 20px rgba(36,22,79,.25);animation:pop .35s cubic-bezier(.2,1.6,.4,1)}
+.nudge{position:relative;background:#fff;border:3px solid var(--purple);border-radius:20px;padding:10px 14px;display:grid;gap:8px;max-width:300px;z-index:2;box-shadow:0 8px 20px rgba(36,22,79,.25);animation:pop .35s cubic-bezier(.2,1.6,.4,1)}
 @keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
 /* overlays */
 .tick{position:fixed;inset:0;display:grid;place-items:center;z-index:40;pointer-events:none}
@@ -184,7 +184,7 @@ input[type=text],input[type=password]{border:2px solid var(--line);background:va
 <script>
 (function () {
   "use strict";
-  const APP_VERSION = "v2.4 · 31 Oct";
+  const APP_VERSION = "v2.6 · 31 Oct";
   const M = window.MathsLab;
   const KEY = "coops-maths-lab-v1";
   const $ = s => document.querySelector(s);
@@ -588,9 +588,9 @@ input[type=text],input[type=password]{border:2px solid var(--line);background:va
       <div class="row between"><span class="chip" style="background:${STRAND_COL[sk.strand]};color:#fff">${sk.name}</span><span class="row" style="gap:8px">${yearChip(q.level)}<span class="chip">⭐ ${run.pts}</span><span class="chip">${run.i + 1} of ${n}</span></span></div>
       <div class="qbody">
         <section class="card qcard" id="qcard">
-          ${cur.nudge ? `<div class="nudge" role="dialog"><b>${moreHints ? "Stuck? Want a hint?" : "Want me to show you how?"}</b><div class="row"><button class="btn yellow" id="nudgeYes">${moreHints ? "Yes, hint please" : "Show me"}</button><button class="btn" id="nudgeNo">I've got it</button></div></div>` : ""}
           <div class="qhead">${mascot(cur.mood)}<div class="prompt">${md(q.prompt)}</div></div>
           <div><button class="speak" id="readQ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 10v4h4l5 4V6L8 10z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg>Read it to me</button></div>
+          ${cur.nudge ? `<div class="nudge" role="dialog"><b>${moreHints ? "Stuck? Want a hint?" : "Want me to show you how?"}</b><div class="row"><button class="btn yellow" id="nudgeYes">${moreHints ? "Yes, hint please" : "Show me"}</button><button class="btn" id="nudgeNo">I've got it</button></div></div>` : ""}
           ${diagram(q.diagram)}
           <div class="hints">${q.hints.slice(0, cur.hintsShown).map((h, i) => `<div class="hint"><b>💡 Hint ${i + 1}:</b> ${md(h)}</div>`).join("")}</div>
           ${cur.shown || answered ? `<div class="steps"><b>How to solve it</b><ol>${q.steps.map(s => `<li>${md(s)}</li>`).join("")}</ol></div>` : ""}

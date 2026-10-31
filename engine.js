@@ -130,74 +130,141 @@
       steps: [`${fmt(N)} is between ${fmt(lo)} and ${fmt(lo + P)}.`, `The digit after the ${COLS[k]} column is ${next}.`, next >= 5 ? `${next} is 5 or more, so round up.` : `${next} is less than 5, so round down.`, `Answer: **${fmt(r)}**`] });
   };
 
+  /* Mental-maths friendly: numbers are rounded so they can be done in your head,
+     and every worked solution shows a mental strategy (split, compensate, chunk). */
   G.addsub = L => {
-    const big = L === 1 ? [100, 9999] : L === 2 ? [1000, 99999] : [10000, 999999];
     const add = Math.random() < 0.5;
-    let a = ri(...big), b = ri(big[0], Math.floor(big[1] / (add ? 1 : 1)));
+    const U = L === 1 ? 100 : 1000;            // the "round" unit for this level
+    let a, b, comp = false;
+    const word = L >= 2 && Math.random() < 0.45;
+    const v = word ? 0.5 + Math.random() / 2 : Math.random();   // word problems use the big round numbers
+    if (L === 1) {
+      if (v < 0.3) { a = ri(12, 89) * 10; b = ri(2, 9) * 100 - 1; comp = true; }           // 470 + 299
+      else { a = ri(11, 95) * 100 + pick([0, 0, 50, 25, 75]); b = ri(2, 40) * 25; }          // 3 450 + 275
+    } else if (L === 2) {
+      if (v < 0.3) { a = ri(12, 95) * 100; b = ri(2, 9) * 1000 - pick([1, 2, 5, 10]); comp = true; } // 6 400 + 2 998
+      else { a = ri(12, 95) * 1000 + pick([0, 250, 500, 750]); b = ri(2, 40) * 250; }         // 45 750 + 6 250
+    } else {
+      if (v < 0.3) { a = ri(120, 950) * 1000; b = ri(2, 9) * 100000 - pick([1000, 2000, 5000]); comp = true; }
+      else { a = ri(120, 950) * 1000 + pick([0, 500, 250]); b = ri(12, 400) * 1000 + pick([0, 500]); }
+    }
     if (!add && b > a) [a, b] = [b, a];
-    if (!add && a === b) a += ri(10, 99);
+    if (!add && a === b) a += U;
+    if (word && add && b > a / 2) b = Math.round(a / 4 / U) * U || U;   // second amount smaller, like real life
     const res = add ? a + b : a - b;
-    const word = L >= 2 && Math.random() < 0.5;
     const n = pick(NAMES);
     let prompt;
-    if (word && add) prompt = pick([`A stadium had **${fmt(a)}** people on Saturday and **${fmt(b)}** on Sunday. How many people over the weekend?`, `${n}'s town planted **${fmt(a)}** trees last year and **${fmt(b)}** this year. How many trees altogether?`]);
-    else if (word) prompt = pick([`A library had **${fmt(a)}** books and gave away **${fmt(b)}**. How many books are left?`, `A game needs **${fmt(a)}** points to win. ${n} has **${fmt(b)}**. How many more points are needed?`]);
-    else prompt = `**${fmt(a)} ${add ? "+" : "−"} ${fmt(b)}**`;
-    const ans = A.num(res), unit = "";
-    const est = (x) => { const p = 10 ** (String(x).length - 1); return Math.round(x / p) * p; };
-    return Q({ prompt, answer: ans, unit,
-      hints: [`Estimate first: about ${fmt(est(a))} ${add ? "+" : "−"} ${fmt(est(b))}.`, `Line them up by place value and start with the ones column.`, add ? `If a column adds to 10 or more, carry the 1 to the next column.` : `If the top digit is smaller, trade 1 from the column to the left.`],
-      steps: [`Estimate: ${fmt(est(a))} ${add ? "+" : "−"} ${fmt(est(b))} ≈ ${fmt(add ? est(a) + est(b) : est(a) - est(b))}`, `Line up the columns:  ${fmt(a)} ${add ? "+" : "−"} ${fmt(b)}`, `Work right to left, ${add ? "carrying" : "trading"} where needed.`, `Answer: **${answerText(ans)}**`] });
+    if (word) {
+      const ctx = add
+        ? (L === 2 ? [`The MCG had **${fmt(a)}** fans on Saturday and **${fmt(b)}** on Sunday. How many fans came over the weekend?`, `${n} scored **${fmt(a)}** points on level 1 of a game and **${fmt(b)}** on level 2. How many points altogether?`]
+                   : [`A town had **${fmt(a)}** people. Over ten years, **${fmt(b)}** more moved in. How many people live there now?`, `A video had **${fmt(a)}** views last week and **${fmt(b)}** this week. How many views altogether?`])
+        : (L === 2 ? [`A stadium holds **${fmt(a)}** people. **${fmt(b)}** tickets have been sold. How many tickets are left?`, `A game needs **${fmt(a)}** points to unlock the next world. ${n} has **${fmt(b)}**. How many more points are needed?`]
+                   : [`A charity wants to raise **$${fmt(a)}**. So far it has raised **$${fmt(b)}**. How many more dollars does it need?`, `A video needs **${fmt(a)}** views to win a prize. It has **${fmt(b)}**. How many more views does it need?`]);
+      prompt = pick(ctx);
+    } else prompt = `**${fmt(a)} ${add ? "+" : "−"} ${fmt(b)}**`;
+    let hints, steps;
+    if (comp) {
+      const round = L === 1 ? Math.ceil(b / 100) * 100 : L === 2 ? Math.ceil(b / 1000) * 1000 : Math.ceil(b / 100000) * 100000;
+      const diff = round - b;
+      hints = [`${fmt(b)} is very close to ${fmt(round)}.`, add ? `Add ${fmt(round)}, then take away the extra ${fmt(diff)}.` : `Take away ${fmt(round)}, then add back the extra ${fmt(diff)}.`];
+      steps = [`${fmt(b)} is ${fmt(diff)} less than ${fmt(round)}.`, add ? `${fmt(a)} + ${fmt(round)} = ${fmt(a + round)}` : `${fmt(a)} − ${fmt(round)} = ${fmt(a - round)}`, add ? `${fmt(a + round)} − ${fmt(diff)} = **${fmt(res)}**` : `${fmt(a - round)} + ${fmt(diff)} = **${fmt(res)}**`];
+    } else {
+      const bH = Math.floor(b / U) * U, bR = b - bH;
+      hints = [`Split ${fmt(b)} into ${fmt(bH)}${bR ? ` and ${fmt(bR)}` : ""}.`, add ? `Add the ${fmt(bH)} first${bR ? `, then the ${fmt(bR)}` : ""}.` : `Take away the ${fmt(bH)} first${bR ? `, then the ${fmt(bR)}` : ""}.`];
+      const mid = add ? a + bH : a - bH;
+      steps = [`Split: ${fmt(b)} = ${fmt(bH)}${bR ? ` + ${fmt(bR)}` : ""}`, `${fmt(a)} ${add ? "+" : "−"} ${fmt(bH)} = ${fmt(mid)}`].concat(bR ? [`${fmt(mid)} ${add ? "+" : "−"} ${fmt(bR)} = **${fmt(res)}**`] : [`Answer: **${fmt(res)}**`]);
+    }
+    return Q({ prompt, answer: A.num(res), hints, steps });
   };
 
   G.mult = L => {
-    let a, b, word = false;
+    let a, b, prompt = null;
     const v = Math.random();
-    if (L === 1) { if (v < 0.4) { a = ri(3, 12); b = ri(3, 12); } else { a = ri(12, 99); b = ri(3, 9); } }
-    else if (L === 2) { if (v < 0.35) { a = ri(101, 999); b = ri(3, 9); } else if (v < 0.5) { a = ri(12, 999); b = pick([10, 100, 1000]); } else { a = ri(12, 49); b = ri(12, 39); } }
-    else { if (v < 0.5) { a = ri(101, 499); b = ri(12, 49); } else { a = ri(25, 99); b = ri(25, 99); word = true; } }
-    const res = a * b;
-    let prompt = `**${fmt(a)} × ${fmt(b)}**`;
-    if (word) prompt = pick([`A school orders **${a}** boxes of pencils with **${b}** pencils in each. How many pencils?`, `${pick(NAMES)} reads **${b}** pages every day for **${a}** days. How many pages?`]);
-    let steps, hints;
-    if (b === 10 || b === 100 || b === 1000) {
-      const z = String(b).length - 1;
-      hints = [`Multiplying by ${b} moves every digit ${z} place${z > 1 ? "s" : ""} to the left.`, `Add ${z} zero${z > 1 ? "s" : ""} to the end of ${a}.`];
-      steps = [`× ${b}: digits move ${z} place${z > 1 ? "s" : ""} left.`, `${fmt(a)} → **${fmt(res)}**`];
-    } else if (b < 10 && a < 13) {
-      hints = [`This is a times-table fact.`, `Count in ${b}s, or use a fact you know: ${a} × ${b - 1} = ${a * (b - 1)}, then add one more ${a}.`];
-      steps = [`${a} × ${b - 1} = ${a * (b - 1)}`, `${a * (b - 1)} + ${a} = **${res}**`];
-    } else if (b < 10) {
-      const parts = String(a).split("").map((d, i, arr) => Number(d) * 10 ** (arr.length - 1 - i)).filter(x => x);
-      hints = [`Split ${a} into ${parts.join(" + ")}.`, `Multiply each part by ${b}: ${parts.map(p => `${p} × ${b}`).join(", ")}.`, `Add the answers together.`];
-      steps = [`${a} = ${parts.join(" + ")}`, ...parts.map(p => `${fmt(p)} × ${b} = ${fmt(p * b)}`), `${parts.map(p => fmt(p * b)).join(" + ")} = **${fmt(res)}**`];
+    if (L === 1) {
+      if (v < 0.45) { a = ri(3, 12); b = ri(3, 12); }
+      else if (v < 0.75) { a = ri(2, 9) * 10; b = ri(2, 9); }                 // 40 × 7
+      else { a = ri(11, 25); b = ri(2, 5); }                                   // 23 × 4
+    } else if (L === 2) {
+      if (v < 0.25) { a = ri(2, 9) * 100; b = ri(2, 9); }                      // 400 × 6
+      else if (v < 0.45) { a = pick([15, 25, 50, 12, 11]); b = ri(4, 20); }    // 25 × 16
+      else if (v < 0.65) { a = ri(12, 99); b = pick([10, 100]); }
+      else if (v < 0.85) { a = ri(2, 9) * 10; b = ri(2, 9) * 10; }             // 30 × 40
+      else { a = ri(21, 49); b = ri(2, 5); }                                   // 34 × 3
     } else {
-      const t = Math.floor(b / 10) * 10, o = b % 10;
-      hints = [`Split ${b} into ${t} + ${o}.`, `Work out ${a} × ${t} and ${a} × ${o}.`, `Add the two answers.`];
-      steps = [`${b} = ${t} + ${o}`, `${fmt(a)} × ${t} = ${fmt(a * t)}`, `${fmt(a)} × ${o} = ${fmt(a * o)}`, `${fmt(a * t)} + ${fmt(a * o)} = **${fmt(res)}**`];
+      const c = ri(0, 5);
+      if (c === 0) { a = ri(2, 9) * 100 + pick([0, 50]); b = ri(2, 9) * 10; }  // 450 × 30
+      else if (c === 1) { a = ri(11, 19); b = ri(11, 19); }                    // 14 × 16
+      else if (c === 2) { a = pick([25, 125, 250]); b = pick([4, 8, 12, 16, 24, 40]); }
+      else if (c === 3) { a = ri(2, 9) * 10; b = pick([24, 36, 48]); prompt = `A school orders **${a}** boxes of pencils with **${b}** pencils in each box. How many pencils is that?`; }
+      else if (c === 4) { b = pick([10, 12, 15, 20, 25, 30]); a = pick([7, 14, 20, 30]); prompt = `${pick(NAMES)} reads **${b}** pages every day for **${a}** days. How many pages is that?`; }
+      else { a = ri(10, 25); b = pick([10, 15, 20, 25, 30]); prompt = `A theatre has **${a}** rows with **${b}** seats in each row. How many seats altogether?`; }
+    }
+    const res = a * b;
+    if (!prompt) prompt = `**${fmt(a)} × ${fmt(b)}**`;
+    let hints, steps;
+    const tz = x => { let z = 0; while (x % 10 === 0 && x > 0) { x /= 10; z++; } return [x, z]; };
+    const [as, az] = tz(a), [bs, bz] = tz(b);
+    if (az + bz > 0 && as <= 99 && bs <= 12) {
+      const core = as * bs, zeros = az + bz;
+      hints = [`Ignore the zeros first: ${as} × ${bs}.`, `${as} × ${bs} = ${fmt(core)}. Now put back ${zeros} zero${zeros > 1 ? "s" : ""}.`];
+      steps = [`Ignore the zeros: ${as} × ${bs} = ${fmt(core)}`, `Put back ${zeros} zero${zeros > 1 ? "s" : ""}: **${fmt(res)}**`];
+    } else if (a === 25 || a === 125 || a === 250) {
+      const k = a === 25 ? 4 : a === 125 ? 8 : 4, base = a === 25 ? 100 : a === 125 ? 1000 : 1000;
+      hints = [`${k} lots of ${a} make ${fmt(base)}.`, `How many ${k}s are in ${b}? ${b} ÷ ${k} = ${b / k}.`];
+      steps = [`${k} × ${a} = ${fmt(base)}`, `${b} = ${b / k} × ${k}`, `So ${a} × ${b} = ${b / k} × ${fmt(base)} = **${fmt(res)}**`];
+    } else if (b < 13 && a < 13) {
+      hints = [`This is a times-table fact.`, `Use one you know: ${a} × ${b - 1} = ${a * (b - 1)}, then add one more ${a}.`];
+      steps = [`${a} × ${b - 1} = ${a * (b - 1)}`, `${a * (b - 1)} + ${a} = **${res}**`];
+    } else {
+      const big = Math.max(a, b), small = Math.min(a, b), t = Math.floor(big / 10) * 10, o = big % 10;
+      hints = [`Split ${big} into ${t} + ${o}.`, `Work out ${t} × ${small} and ${o} × ${small}, then add.`];
+      steps = [`${big} = ${t} + ${o}`, `${t} × ${small} = ${fmt(t * small)}`, `${o} × ${small} = ${fmt(o * small)}`, `${fmt(t * small)} + ${fmt(o * small)} = **${fmt(res)}**`];
     }
     return Q({ prompt, answer: A.num(res), hints, steps });
   };
 
   G.div = L => {
     const v = Math.random();
-    if (L === 1 || v < 0.45) {
-      const d = L === 1 ? ri(2, 9) : ri(3, 9), q = L === 1 ? ri(3, 15) : L === 2 ? ri(12, 150) : ri(120, 1200);
+    if (L === 1 || v < 0.55) {
+      let d, q;
+      if (L === 1) { d = ri(2, 9); q = ri(2, 12); }
+      else if (L === 2) { d = ri(2, 9); q = pick([ri(2, 12) * 10, ri(2, 9) * 100, ri(11, 25)]); if (q > 12 && q < 30) d = ri(2, 5); } // 360 ÷ 9, 4 800 ÷ 6, 84 ÷ 4
+      else { if (Math.random() < 0.5) { d = pick([12, 15, 20, 25, 50]); q = pick([ri(2, 12) * 10, ri(4, 12)]); } else { d = ri(3, 9); q = ri(2, 12) * pick([50, 100]); } } // 600 ÷ 12, 2 400 ÷ 8
       const n = d * q;
-      const chunk = Math.floor(q / 10) * 10;
-      return Q({ prompt: `**${fmt(n)} ÷ ${d}**`, answer: A.num(q),
-        hints: [`How many ${d}s make ${fmt(n)}? Think of your ${d} times table.`, chunk ? `${d} × ${chunk} = ${fmt(d * chunk)}. How much is left?` : `${d} × what = ${n}?`, chunk ? `${fmt(n - d * chunk)} ÷ ${d} = ${q - chunk}. Add the chunks.` : `Count up in ${d}s.`],
-        steps: chunk ? [`Take a big chunk: ${d} × ${chunk} = ${fmt(d * chunk)}`, `Left over: ${fmt(n)} − ${fmt(d * chunk)} = ${fmt(n - d * chunk)}`, `${fmt(n - d * chunk)} ÷ ${d} = ${q - chunk}`, `${chunk} + ${q - chunk} = **${fmt(q)}**`] : [`${d} × ${q} = ${n}`, `So ${n} ÷ ${d} = **${q}**`] });
+      const [qs, qz] = (() => { let x = q, z = 0; while (x % 10 === 0) { x /= 10; z++; } return [x, z]; })();
+      let hints, steps;
+      if (qz > 0 && qs <= 12) {
+        const core = n / 10 ** qz;
+        hints = [`Use a times-table fact: ${d} × ? = ${fmt(core)}.`, `${d} × ${qs} = ${fmt(core)}, so add back ${qz} zero${qz > 1 ? "s" : ""}.`];
+        steps = [`Hide the zero${qz > 1 ? "s" : ""}: ${fmt(core)} ÷ ${d} = ${qs}`, `Put ${qz > 1 ? "them" : "it"} back: **${fmt(q)}**`];
+      } else if (q > 12) {
+        const t = Math.floor(q / 10) * 10, o = q - t;
+        hints = [`Split ${fmt(n)} into parts that divide by ${d}: ${fmt(d * t)} and ${fmt(d * o)}.`, `${fmt(d * t)} ÷ ${d} = ${t}, ${fmt(d * o)} ÷ ${d} = ${o}.`];
+        steps = [`${fmt(n)} = ${fmt(d * t)} + ${fmt(d * o)}`, `${fmt(d * t)} ÷ ${d} = ${t}`, `${fmt(d * o)} ÷ ${d} = ${o}`, `${t} + ${o} = **${q}**`];
+      } else {
+        hints = [`Think: ${d} × what = ${fmt(n)}?`, `Count in ${d}s or use your ${d} times table.`];
+        steps = [`${d} × ${q} = ${fmt(n)}`, `So ${fmt(n)} ÷ ${d} = **${q}**`];
+      }
+      return Q({ prompt: `**${fmt(n)} ÷ ${d}**`, answer: A.num(q), hints, steps });
     }
-    // remainder word problems
-    const d = L === 2 ? ri(4, 9) : ri(12, 30), q = L === 2 ? ri(6, 40) : ri(8, 40), r = ri(1, d - 1), n = d * q + r;
-    const up = Math.random() < 0.5;
-    const prompt = up ? `**${n}** students are going on an excursion. Each bus holds **${d}**. How many buses are needed?`
-      : `${pick(NAMES)} has **${n}** eggs and packs them into cartons of **${d}**. How many **full** cartons?`;
+    // remainder word problems with realistic group sizes
+    const CTX = L === 2 ? [
+      { up: true, d: [4, 5], q: [5, 12], thing: "car", t: (n, d) => `**${n}** people need a lift to the footy. Each car can take **${d}** passengers. How many cars are needed?` },
+      { up: true, d: [6, 8], q: [3, 10], thing: "table", t: (n, d) => `**${n}** kids are coming to a party. Each table seats **${d}**. How many tables are needed?` },
+      { up: false, d: [6], q: [4, 12], thing: "carton", t: (n, d) => `${pick(NAMES)} has **${n}** eggs and packs them into cartons of **${d}**. How many **full** cartons?` },
+      { up: false, d: [5, 7], q: [3, 8], thing: "team", t: (n, d) => `**${n}** kids turn up to ${d === 5 ? "basketball" : "netball"} training. How many **full** teams of **${d}** can be made?` },
+      { up: false, d: [8], q: [4, 12], thing: "box", t: (n, d) => `A teacher packs **${n}** pencils into boxes of **${d}**. How many **full** boxes?` },
+    ] : [
+      { up: true, d: [25, 30, 40, 45, 50], q: [2, 6], thing: "bus", t: (n, d) => `**${n}** students are going on an excursion. Each bus holds **${d}** students. How many buses are needed?` },
+      { up: false, d: [12], q: [5, 12], thing: "carton", t: (n, d) => `A farm collects **${n}** eggs. They're packed in cartons of a dozen (**12**). How many **full** cartons?` },
+      { up: true, d: [10, 12], q: [3, 9], thing: "minibus", t: (n, d) => `**${n}** fans are travelling to a game. Each minibus seats **${d}**. How many minibuses are needed?` },
+      { up: false, d: [15, 20, 25], q: [4, 12], thing: "ball", t: (n, d) => `A school has **$${n}** to spend on basketballs that cost **$${d}** each. How many basketballs can it buy?` },
+    ];
+    const c = pick(CTX), d = pick(c.d), q = ri(...c.q), r = ri(1, d - 1), n = d * q + r, up = c.up;
     const ans = up ? q + 1 : q;
-    return Q({ prompt, answer: A.num(ans),
-      hints: [`Work out ${n} ÷ ${d}.`, `${d} × ${q} = ${d * q}, with ${r} left over.`, up ? `The ${r} left over still need a seat!` : `The ${r} left over can't fill a carton.`],
-      steps: [`${n} ÷ ${d} = ${q} remainder ${r}`, up ? `The ${r} extra students need another bus, so round up.` : `Only full cartons count, so ignore the remainder.`, `Answer: **${ans}**`] });
+    return Q({ prompt: c.t(n, d), answer: A.num(ans),
+      hints: [`How many ${d}s fit into ${n}? Try ${d} × ${q}.`, `${d} × ${q} = ${d * q}, with ${r} left over.`, up ? `The ${r} left over still need a ${c.thing}!` : `The ${r} left over aren't enough for another ${c.thing}.`],
+      steps: [`${d} × ${q} = ${d * q}, and ${n} − ${d * q} = ${r} left over`, up ? `The ${r} left over need one more ${c.thing}, so round up.` : `Only full ${c.thing === "box" ? "boxes" : c.thing + "s"} count, so ignore the ${r}.`, `Answer: **${ans}**`] });
   };
 
   G.order = L => {
@@ -266,9 +333,9 @@
         steps: [`Make them the same length: ${opts.map(o => Number(o).toFixed(w)).join(", ")}`, `Compare digit by digit from the left.`, `Largest: **${opts[best]}**`] });
     }
     if (v < 0.75 || L === 1) {
-      const a = ri(S, 20 * S), b = ri(S / 10 + 1, 10 * S), add = Math.random() < 0.5 || a <= b;
+      const step = L === 1 ? 1 : L === 2 ? pick([5, 25]) : pick([5, 25, 50]), a = ri(S / step, (20 * S) / step) * step, b = ri(1, (8 * S) / step) * step, add = Math.random() < 0.5 || a <= b;
       const res = add ? a + b : a - b;
-      const fa = (a / S).toFixed(dp), fb = (b / S).toFixed(dp);
+      const fa = fmt(a / S), fb = fmt(b / S);
       return Q({ prompt: `**${fa} ${add ? "+" : "−"} ${fb}**`, answer: A.num(res / S),
         hints: [`Line up the decimal points.`, `Work it like whole numbers: ${a} ${add ? "+" : "−"} ${b} = ${res}, then put the point back.`],
         steps: [`Line up the points:  ${fa} ${add ? "+" : "−"} ${fb}`, `Without the points: ${a} ${add ? "+" : "−"} ${b} = ${res}`, `Put the point back (${dp} decimal place${dp > 1 ? "s" : ""}): **${fmt(res / S)}**`] });
@@ -380,7 +447,7 @@
     }
     if (L === 2) {
       if (v < 0.4) { const w = ri(6, 25), h = ri(4, 15); return Q({ prompt: `A rectangle has an area of **${w * h} m²** and a width of **${h} m**. How long is it?`, answer: A.num(w), unit: "m", diagram: { k: "rect", w, h, wl: `? m`, hl: `${h} m` }, hints: [`Area = length × width, so length = area ÷ width.`, `${w * h} ÷ ${h}`], steps: [`length = ${w * h} ÷ ${h} = **${w} m**`] }); }
-      if (v < 0.7) { const w = ri(8, 30), h = ri(5, 20); return Q({ prompt: `A garden bed is **${w} m** long and **${h} m** wide. What is its **area**?`, answer: A.num(w * h), unit: "m²", diagram: { k: "rect", w, h, wl: `${w} m`, hl: `${h} m` }, hints: [`Area = length × width.`, `${w} × ${h}: split it up if it helps.`], steps: [`${w} × ${h} = **${w * h} m²**`] }); }
+      if (v < 0.7) { const w = ri(2, 8) * 5, h = ri(3, 12); return Q({ prompt: `A garden bed is **${w} m** long and **${h} m** wide. What is its **area**?`, answer: A.num(w * h), unit: "m²", diagram: { k: "rect", w, h, wl: `${w} m`, hl: `${h} m` }, hints: [`Area = length × width.`, `${w} × ${h}: split it up if it helps.`], steps: [`${w} × ${h} = **${w * h} m²**`] }); }
       const s = ri(3, 15), per = 4 * s; return Q({ prompt: `A square has a perimeter of **${per} cm**. What is its **area**?`, answer: A.num(s * s), unit: "cm²", hints: [`All 4 sides of a square are equal. Find one side first.`, `${per} ÷ 4 = ${s} cm.`], steps: [`Side = ${per} ÷ 4 = ${s} cm`, `Area = ${s} × ${s} = **${s * s} cm²**`] });
     }
     if (v < 0.4) { const b = ri(2, 15) * 2, h = ri(3, 14); return Q({ prompt: `What is the **area** of this triangle?`, answer: A.num(b * h / 2), unit: "cm²", diagram: { k: "tri", b, h, bl: `${b} cm`, hl: `${h} cm` }, hints: [`A triangle is half of a rectangle.`, `Area = base × height ÷ 2.`], steps: [`base × height = ${b} × ${h} = ${b * h}`, `÷ 2 = **${b * h / 2} cm²**`] }); }
@@ -427,13 +494,13 @@
       const h = ri(1, 4), m = ri(1, 11) * 5; return Q({ prompt: `How many minutes in **${h} h ${m} min**?`, answer: A.num(h * 60 + m), unit: "min", hints: [`There are 60 minutes in an hour.`, `${h} × 60 = ${h * 60}. Add the ${m}.`], steps: [`${h} × 60 = ${h * 60}`, `${h * 60} + ${m} = **${h * 60 + m} min**`] });
     }
     if (L === 2) {
-      const h1 = ri(7, 14), m1 = ri(0, 11) * 5, dur = ri(4, 30) * 5, e = h1 * 60 + m1 + dur, h2 = Math.floor(e / 60), m2 = e % 60;
+      const h1 = ri(9, 18), m1 = ri(0, 11) * 5, dur = ri(16, 34) * 5, e = h1 * 60 + m1 + dur, h2 = Math.floor(e / 60), m2 = e % 60;
       const toHour = 60 - m1;
       return Q({ prompt: `A movie starts at **${t12(h1, m1)}** and finishes at **${t12(h2, m2)}**. How many minutes long is it?`, answer: A.num(dur), unit: "min",
         hints: [`Jump from ${t12(h1, m1)} to the next whole hour first.`, m1 ? `That's ${toHour} minutes to ${t12(h1 + 1, 0)}.` : `Count the whole hours, then the extra minutes.`, `Then count on to ${t12(h2, m2)}.`],
         steps: m1 && dur > toHour ? [`${t12(h1, m1)} → ${t12(h1 + 1, 0)} = ${toHour} min`, `${t12(h1 + 1, 0)} → ${t12(h2, m2)} = ${dur - toHour} min`, `${toHour} + ${dur - toHour} = **${dur} min**`] : [`Count on from ${t12(h1, m1)} to ${t12(h2, m2)}.`, `= **${dur} min**`] });
     }
-    const h1 = ri(6, 19), m1 = ri(0, 59), dh = ri(1, 3), dm = ri(5, 55), e = (h1 * 60 + m1 + dh * 60 + dm) % 1440, h2 = Math.floor(e / 60), m2 = e % 60;
+    const h1 = ri(6, 19), m1 = ri(0, 11) * 5, dh = ri(1, 3), dm = ri(1, 11) * 5, e = (h1 * 60 + m1 + dh * 60 + dm) % 1440, h2 = Math.floor(e / 60), m2 = e % 60;
     return Q({ prompt: `A train leaves at **${two(h1)}:${two(m1)}**. The trip takes **${dh} h ${dm} min**. What time does it arrive? (24-hour time)`, answer: A.time(h2, m2),
       hints: [`Add the hours first, then the minutes.`, `${two(h1)}:${two(m1)} + ${dh} h = ${two(h1 + dh)}:${two(m1)}.`, `Now add ${dm} min. If the minutes go past 60, carry an hour.`],
       steps: [`+ ${dh} h → ${two(h1 + dh)}:${two(m1)}`, `+ ${dm} min → ${m1 + dm >= 60 ? `${m1} + ${dm} = ${m1 + dm} min = 1 h ${m1 + dm - 60} min` : `${m1} + ${dm} = ${m1 + dm} min`}`, `Arrives **${two(h2)}:${two(m2)}**`] });
