@@ -166,6 +166,31 @@ input[type=text],input[type=password]{border:2px solid var(--line);background:va
 .statcard .muted{color:rgba(255,255,255,.85)}
 .bob{animation:bob 2.4s ease-in-out infinite}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+/* working-out pad */
+.qcard{min-width:0}
+.pad{min-width:0;grid-template-columns:minmax(0,1fr);background:#fffef6;border:3px solid #e9e2c8;border-radius:20px;padding:10px 12px 12px;display:grid;gap:8px;position:relative}
+.padbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.padbar b{flex:1 1 100%;font-size:1.15rem}
+.padbar button{border:0;border-radius:14px;padding:9px 12px;white-space:nowrap;font:inherit;font-weight:700;background:#efe9d2;color:var(--ink);min-height:46px}
+.padbar button.on{background:var(--blue);color:#fff}
+.padarea{position:relative;touch-action:pan-y}
+.padarea.writing{touch-action:none}
+.pline{display:flex;align-items:center;height:64px;border-bottom:2px solid #c9d8ff;gap:6px}
+.pline input{flex:1;min-width:0;width:0;height:100%;border:0;background:transparent;font-size:2rem;font-weight:700;line-height:1;font-family:inherit;color:#24164f;padding:0 6px;font-variant-numeric:tabular-nums;outline:none}
+.pline input[readonly]{pointer-events:none}
+.pad .st{width:34px;height:34px;flex:none;display:grid;place-items:center;font-size:1.4rem;border-radius:50%}
+.pad .st.ok{background:#d9f9e7;color:var(--green)} .pad .st.bad{background:#fff3cf}
+.padarea canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.padarea.writing canvas{pointer-events:auto}
+.padarea.sketching .pline{border-bottom-color:transparent}
+.padarea.sketching{background:#fff;border-radius:12px}
+.padpop{position:absolute;left:12px;right:12px;z-index:5;background:#fff;border:3px solid var(--yellow);border-radius:18px;padding:12px 14px;box-shadow:0 10px 28px rgba(36,22,79,.25);display:grid;gap:8px;font-size:1.15rem;animation:pop2 .3s cubic-bezier(.2,1.6,.4,1)}
+.padpop.good{border-color:var(--green)}
+.padpop::before{content:"";position:absolute;top:-12px;left:40px;border:10px solid transparent;border-top:0;border-bottom:12px solid var(--yellow)}
+.padpop.good::before{border-bottom-color:var(--green)}
+.padpop .row{justify-content:flex-end}
+.padnote{font-size:.95rem;color:var(--muted);margin:0}
 @media (prefers-reduced-motion:reduce){.bob,.shake,.tick svg,.nudge,.toast{animation:none}.tick svg{opacity:1}}
 </style>
 </head>
@@ -181,10 +206,11 @@ input[type=text],input[type=password]{border:2px solid var(--line);background:va
 <section class="qscreen" id="qscreen" hidden></section>
 <canvas id="confetti" hidden></canvas>
 <script src="engine.js"></script>
+<script src="pad.js"></script>
 <script>
 (function () {
   "use strict";
-  const APP_VERSION = "v2.6 · 31 Oct";
+  const APP_VERSION = "v2.7 · 21 Nov";
   const M = window.MathsLab;
   const KEY = "coops-maths-lab-v1";
   const $ = s => document.querySelector(s);
@@ -575,7 +601,95 @@ input[type=text],input[type=password]{border:2px solid var(--line);background:va
     }
   }
   const touch = () => { if (cur) cur.lastAct = Date.now(); };
+  /* ---------- working-out pad ---------- */
+  const PAD_LH = 64;
+  function padState() { if (!cur.pad) cur.pad = { lines: ["", "", "", ""], st: [], mode: "write", undo: [], pop: null, strokes: [], sketch: [], acts: [] }; return cur.pad; }
+  function answerVals(q) { const a = q.answer; return a.t === "num" ? [a.v] : a.t === "frac" ? [a.n / a.d, a.n, a.d] : a.t === "time" ? [a.h, a.m] : []; }
+  function padHtml(answered) {
+    const p = padState(), writing = (p.mode === "write" || p.mode === "sketch") && !answered;
+    const icon = s => s === "ok" || s === "done" ? '<span class="st ok">✓</span>' : s === "wrong" || s === "offpath" ? '<span class="st bad">🤔</span>' : '<span class="st"></span>';
+    return `<div class="pad" id="pad">
+      <div class="padbar"><b>✏️ My working</b>${answered ? "" : `<button data-pm="write" class="${p.mode === "write" ? "on" : ""}">✏️ Write</button><button data-pm="sketch" class="${p.mode === "sketch" ? "on" : ""}">🖍️ Sketch</button><button data-pm="type" class="${p.mode === "type" ? "on" : ""}">⌨️ Type</button><button id="padUndo" aria-label="Undo">↩︎</button><button id="padClear" aria-label="Clear the pad">🗑</button>`}</div>
+      <div class="padarea ${writing ? "writing" : ""} ${p.mode === "sketch" && !answered ? "sketching" : ""}" id="padarea">
+        ${p.lines.map((t, i) => `<div class="pline">${icon(p.st[i])}<input data-pl="${i}" value="${esc(t)}" ${writing || answered ? "readonly" : ""} autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="text" aria-label="Working line ${i + 1}"></div>`).join("")}
+        <canvas id="padcv"></canvas>
+        ${p.pop ? `<div class="padpop ${p.pop.good ? "good" : ""}" style="top:${(p.pop.line + 1) * PAD_LH + 6}px"><span>${p.pop.html}</span><div class="row"><button class="btn ${p.pop.good ? "green" : "yellow"}" id="padPopOk">${p.pop.good ? "Yay!" : "OK, I'll check"}</button></div></div>` : ""}
+      </div>
+      ${answered ? "" : `<p class="padnote">${p.mode === "write" ? "Write with your finger. It turns into neat numbers when you stop. Use = to check a line." : p.mode === "sketch" ? "Draw a picture to help: groups, arrays, a number line or a shape. Shapes and numbers tidy up when you stop." : "Type your working. Use x or * for times, / for divide."}</p>`}
+    </div>`;
+  }
+  function padCheck(i) {
+    const p = padState(), q = cur.q, r = Pad.checkLine(p.lines[i], q, answerVals(q)); p.st[i] = r.kind;
+    if (r.kind === "wrong") { p.pop = { line: i, html: `Hmm 🤔 Have another look at <b>${esc(r.left.trim())}</b>. Is that what it equals?` }; sfx("hint"); say("Have another look at " + r.left); }
+    else if (r.kind === "offpath") {
+      const more = cur.hintsShown < q.hints.length;
+      p.pop = { line: i, html: more ? "Good sum, but will it help answer the question? 💡 I've put a hint above." : "Good sum, but will it help answer the question? Read the question again." };
+      if (more) { showHint(); return; } sfx("hint"); say("Good sum, but will it help answer the question?");
+    }
+    else if (r.kind === "done") { p.pop = { line: i, good: true, html: "Looking great! 🌟 If that's your answer, put it in the answer box." }; sfx("tap"); cur.mood = "wow"; }
+    else if (r.kind === "ok") { p.pop = null; cur.mood = "happy"; }
+    else p.pop = null;
+    drawQ();
+  }
+  function padSnap() { // turn the ink into typed text, line by line
+    const p = padState(); clearTimeout(p.timer); if (!p.strokes.length) return false;
+    const byLine = new Map();
+    for (const s of p.strokes) { let y0 = 1e9, y1 = -1e9; for (const pt of s) { y0 = Math.min(y0, pt[1]); y1 = Math.max(y1, pt[1]); }
+      const li = Math.max(0, Math.min(p.lines.length - 1, Math.floor(((y0 + y1) / 2) / PAD_LH))); if (!byLine.has(li)) byLine.set(li, []); byLine.get(li).push(s); }
+    p.strokes = []; const changed = [];
+    for (const [li, ss] of byLine) {
+      const txt = Pad.recognise(ss, PAD_LH); if (!txt) continue;
+      p.undo.push({ li, prev: p.lines[li] }); p.acts.push("line"); p.lines[li] = Pad.pretty(p.lines[li] + txt); changed.push(li);
+    }
+    if (p.lines[p.lines.length - 1].trim()) p.lines.push("");
+    return changed;
+  }
+  function bindPad(answered) {
+    const p = padState(), area = $("#padarea"), cv = $("#padcv"); if (!area) return;
+    document.querySelectorAll("[data-pm]").forEach(b => b.onclick = () => { touch(); padSnap(); p.mode = b.dataset.pm; p.pop = null; drawQ(); if (p.mode === "type") { const last = Math.max(0, p.lines.findIndex(t => !t.trim())); const inp = document.querySelector(`[data-pl="${last}"]`); if (inp) inp.focus(); } });
+    const u = $("#padUndo"); if (u) u.onclick = () => { touch(); if (p.skPending && p.skPending.length) { p.skPending.pop(); clearTimeout(p.skTimer); redraw(); return; } if (p.strokes.length) { p.strokes.pop(); redraw(); return; } const last = p.acts.pop(); if (last === "sketch") { p.sketch.pop(); redraw(); return; } const o = p.undo.pop(); if (o) { p.lines[o.li] = o.prev; p.st[o.li] = undefined; p.pop = null; drawQ(); } };
+    const c = $("#padClear"); if (c) c.onclick = () => { touch(); p.lines = ["", "", "", ""]; p.st = []; p.pop = null; p.strokes = []; p.sketch = []; p.skPending = []; p.undo = []; p.acts = []; drawQ(); };
+    const po = $("#padPopOk"); if (po) po.onclick = () => { p.pop = null; drawQ(); };
+    document.querySelectorAll("[data-pl]").forEach(inp => {
+      let t = null; const i = +inp.dataset.pl;
+      inp.oninput = () => { touch(); p.lines[i] = inp.value; p.st[i] = undefined; clearTimeout(t); t = setTimeout(() => { if (document.activeElement === inp) padCheckQuiet(i); }, 1200); };
+      inp.onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); p.lines[i] = Pad.pretty(inp.value); if (i === p.lines.length - 1) p.lines.push(""); padCheck(i); setTimeout(() => { const n = document.querySelector(`[data-pl="${i + 1}"]`); if (n) n.focus(); }, 30); } };
+      inp.onblur = () => { if (p.mode !== "type" || answered) return; const v = Pad.pretty(inp.value); if (v !== p.lines[i] || p.st[i] === undefined) { p.lines[i] = v; setTimeout(() => { if (!document.activeElement || !document.activeElement.dataset || document.activeElement.dataset.pl === undefined) padCheck(i); else padCheckQuiet(i); }, 0); } };
+    });
+    if (!cv) return;
+    const dpr = window.devicePixelRatio || 1, W = area.clientWidth, H = area.clientHeight;
+    cv.width = W * dpr; cv.height = H * dpr; const x = cv.getContext("2d"); x.scale(dpr, dpr);
+    function redraw() { x.clearRect(0, 0, W, H); x.lineCap = x.lineJoin = "round"; x.strokeStyle = x.fillStyle = "#e0559b"; x.lineWidth = 4; for (const it of p.sketch) drawItem(it); for (const s of p.skPending || []) { x.beginPath(); s.forEach((pt, k) => k ? x.lineTo(pt[0], pt[1]) : x.moveTo(pt[0], pt[1])); if (s.length === 1) x.lineTo(s[0][0] + 0.1, s[0][1]); x.stroke(); } x.strokeStyle = "#2f6bff"; for (const s of p.strokes) { x.beginPath(); s.forEach((pt, k) => k ? x.lineTo(pt[0], pt[1]) : x.moveTo(pt[0], pt[1])); if (s.length === 1) x.lineTo(s[0][0] + 0.1, s[0][1]); x.stroke(); } }
+    function drawItem(it) {
+      x.beginPath();
+      if (it.t === "text") { x.font = `700 ${Math.round(it.h)}px ${getComputedStyle(document.body).fontFamily}`; x.textBaseline = "alphabetic"; x.fillText(it.txt, it.x, it.y); return; }
+      if (it.t === "ell") x.ellipse(it.cx, it.cy, Math.max(1, it.rx), Math.max(1, it.ry), 0, 0, Math.PI * 2);
+      else { const pts = it.t === "free" ? it.pts : it.pts; pts.forEach((pt, k) => k ? x.lineTo(pt[0], pt[1]) : x.moveTo(pt[0], pt[1])); if (it.closed) x.closePath(); if (pts.length === 1) x.lineTo(pts[0][0] + 0.1, pts[0][1]); }
+      x.stroke();
+    }
+    function tidySketch() { // after a short pause: numbers become typed text, shapes snap clean
+      const pend = p.skPending || []; p.skPending = []; if (!pend.length) return;
+      const t = Pad.sketchText(pend);
+      if (t) { p.sketch.push({ t: "text", txt: Pad.pretty(t.txt).replace(/ /g, ""), x: t.x, y: t.y, h: Math.max(22, Math.min(70, t.h)) }); p.acts.push("sketch"); }
+      else for (const s of pend) { p.sketch.push(Pad.fitShape(s) || { t: "free", pts: s }); p.acts.push("sketch"); }
+      redraw();
+    }
+    p.flushSketch = tidySketch;
+    redraw();
+    if (answered || (p.mode !== "write" && p.mode !== "sketch")) return;
+    let pid = null, cs = null;
+    const pos = e => { const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+    cv.onpointerdown = e => { if (pid !== null) return; e.preventDefault(); pid = e.pointerId; try { cv.setPointerCapture(pid); } catch (_) {} touch(); clearTimeout(p.timer); if (p.pop) { p.pop = null; const pp = area.querySelector(".padpop"); if (pp) pp.remove(); } cs = [pos(e)]; if (p.mode === "sketch") { clearTimeout(p.skTimer); (p.skPending = p.skPending || []).push(cs); } else p.strokes.push(cs); redraw(); };
+    cv.onpointermove = e => { if (e.pointerId !== pid) return; e.preventDefault(); for (const ev of (e.getCoalescedEvents ? e.getCoalescedEvents() : [e])) cs.push(pos(ev)); redraw(); };
+    const up = e => { if (e.pointerId !== pid) return; pid = null;
+      if (p.mode === "sketch") { const lowest = Math.max(...cs.map(q => q[1])); cs = null; clearTimeout(p.skTimer); p.skTimer = setTimeout(() => { tidySketch(); if (lowest > H - PAD_LH) { p.lines.push(""); drawQ(); } }, 700); return; }
+      cs = null; clearTimeout(p.timer); p.timer = setTimeout(() => { const ch = padSnap(); if (ch === false) return; const last = ch.length ? Math.max(...ch) : -1; drawQ(); if (last >= 0) padCheck(last); }, 850); };
+    cv.onpointerup = up; cv.onpointercancel = up;
+  }
+  function padCheckQuiet(i) { const p = padState(), r = Pad.checkLine(p.lines[i], cur.q, answerVals(cur.q)); p.st[i] = r.kind === "ok" || r.kind === "done" ? r.kind : undefined; const el = document.querySelector(`[data-pl="${i}"]`); if (el && el.previousElementSibling) { el.previousElementSibling.className = "st" + (p.st[i] ? " ok" : ""); el.previousElementSibling.textContent = p.st[i] ? "✓" : ""; } }
   function drawQ() {
+    if (cur && cur.pad) { clearTimeout(cur.pad.skTimer); if (cur.pad.skPending && cur.pad.skPending.length && cur.pad.flushSketch) cur.pad.flushSketch(); }
+    if (cur && cur.pad && cur.pad.strokes.length) padSnap();
     const q = cur.q, sk = M.SKILL[q.skill], n = run.qs.length;
     const prog = run.qs.map((_, i) => `<i class="${i < run.results.length ? (run.results[i] ? "ok" : "no") : i === run.i ? "cur" : ""}"></i>`).join("");
     const isChoice = q.answer.t === "choice";
@@ -595,6 +709,7 @@ input[type=text],input[type=password]{border:2px solid var(--line);background:va
           <div class="hints">${q.hints.slice(0, cur.hintsShown).map((h, i) => `<div class="hint"><b>💡 Hint ${i + 1}:</b> ${md(h)}</div>`).join("")}</div>
           ${cur.shown || answered ? `<div class="steps"><b>How to solve it</b><ol>${q.steps.map(s => `<li>${md(s)}</li>`).join("")}</ol></div>` : ""}
           ${feedbackHtml()}
+          ${padHtml(answered)}
         </section>
         <section style="display:grid;gap:12px;align-content:start">
           ${isChoice ? `<div class="choices">${q.answer.o.map((o, i) => `<button data-choice="${i}" class="${cur.choice === i ? "sel" : ""}" style="background:${COLORS[i % COLORS.length]}" ${answered ? "disabled" : ""}>${esc(o)}</button>`).join("")}</div>` :
@@ -608,6 +723,7 @@ input[type=text],input[type=password]{border:2px solid var(--line);background:va
             </div>`}
         </section>
       </div></div>`;
+    bindPad(answered);
     $("#qclose").onclick = closeQ;
     $("#mute").onclick = () => { S.voice = !S.voice; save(); if (!S.voice) hush(); else readQuestion(q); drawQ(); };
     $("#readQ").onclick = () => { touch(); readQuestion(q); };
